@@ -14,7 +14,7 @@ namespace SimpleAI {
             var modificationFactor = 1f - 1f / considerations.Length;
             foreach (var consideration in considerations) {
                 var score = ctx.GetCurrentConsiderationScore(consideration.Idx);
-                score = consideration.curve.Evaluate(score);
+                score = consideration.Curve.Evaluate(score);
 
                 var makeUpValue = (1f - score) * modificationFactor;
                 score += (makeUpValue * score);

@@ -18,7 +18,7 @@ namespace SimpleAI {
                 if (actionSet.checks != null) {
                     var checksFailed = false;
                     foreach (var check in actionSet.checks) {
-                        if (!check.Foo(ctx)) {
+                        if (!check.Evaluate(ctx)) {
 #if UNITY_EDITOR
                             ctx.Listener?.Log($"<i>{actionSet.name}</i> <color=grey>failed {check}</color>\n");
 #endif

@@ -6,8 +6,8 @@ namespace SimpleAI {
         [SerializeReferenceButton]
         public ICheckBase Check;
 
-        public bool Foo(IContext ctx) {
-            return !Check.Foo(ctx);
+        public bool Evaluate(IContext ctx) {
+            return !Check.Evaluate(ctx);
         }
     }
 }

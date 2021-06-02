@@ -13,18 +13,18 @@ namespace SimpleAI {
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
-            var input = property.FindPropertyRelative("input");
-            var Idx = property.FindPropertyRelative("Idx");
-            var curve = property.FindPropertyRelative("curve");
+            var idxProperty = property.FindPropertyRelative("Idx");
+            var curveProperty = property.FindPropertyRelative("Curve");
 
             EditorGUI.BeginProperty(position, label, property);
 
             {
                 var targetObject = property.serializedObject.targetObject;
 
-                // Code from hell: Resolve ScriptableObject Action type to Action<T> where T:IContext
-                // Then instantiate the found type T (IContext) and call GetConsiderationDescriptions
+                // Code from hell: Resolve owning Object to IBoundToContextType<T> where T:IContext
+                // Then instantiate the found IContext type and call GetConsiderationDescriptions
                 // to present the user with a list of possible considerations
+                // #todo should be cached
                 var t = targetObject.GetType();
                 while (t != typeof(System.Object) && !t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IBoundToContextType<>))) {
                     t = t.BaseType;
@@ -38,13 +38,13 @@ namespace SimpleAI {
                     var descs = ctxTempInstance.GetConsiderationDescriptions();
                     var indices = Enumerable.Range(0, descs.Length + 1).ToArray();
 
-                    Idx.intValue = EditorGUI.IntPopup(new Rect(position.x, position.y, position.width, lineHeight), Idx.intValue, descs, indices);
+                    idxProperty.intValue = EditorGUI.IntPopup(new Rect(position.x, position.y, position.width, lineHeight), idxProperty.intValue, descs, indices);
                 } else {
                     EditorGUI.LabelField(new Rect(position.x, position.y, position.width, lineHeight), "<Can't resolve, no IBoundToContextType derived base class found>");
                 }
             }
 
-            curve.animationCurveValue = EditorGUI.CurveField(new Rect(position.x, position.y + lineHeight, position.width, position.height - lineHeight), curve.animationCurveValue);
+            curveProperty.animationCurveValue = EditorGUI.CurveField(new Rect(position.x, position.y + lineHeight, position.width, position.height - lineHeight), curveProperty.animationCurveValue);
 
             EditorGUI.EndProperty();
         }

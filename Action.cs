@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SimpleAI {
     [Serializable]
     public class Consideration {
         public int Idx;
-        public AnimationCurve curve = new AnimationCurve(new Keyframe[] { new Keyframe(0, 0), new Keyframe(1, 1) });
+        [FormerlySerializedAs("curve")]
+        public AnimationCurve Curve = new AnimationCurve(new Keyframe[] { new Keyframe(0, 0), new Keyframe(1, 1) });
     }
 
     public abstract class ActionBase : ScriptableObject {
@@ -21,7 +23,7 @@ namespace SimpleAI {
             var modificationFactor = 1f - 1f / considerations.Length;
             foreach (var consideration in considerations) {
                 var score = ctx.GetCurrentConsiderationScore(consideration.Idx);
-                score = consideration.curve.Evaluate(score);
+                score = consideration.Curve.Evaluate(score);
 
                 var makeUpValue = (1f - score) * modificationFactor;
                 score += (makeUpValue * score);
