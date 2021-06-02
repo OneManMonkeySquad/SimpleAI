@@ -6,6 +6,7 @@ Coroutine-based utility AI for [Unity3d](https://unity3d.com).
 ![Parts](Docs/Parts.png)
 
 ```cs
+// A context contains all the data that's relevant for the AI to run.
 public class ActorAIContext : IContext {
     public Actor Actor;
 #if UNITY_EDITOR
