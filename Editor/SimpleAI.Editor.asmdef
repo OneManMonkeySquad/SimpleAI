@@ -1,0 +1,18 @@
+{
+    "name": "SimpleAI.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:a1f28d71bc148164cb2282c886296831"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
