@@ -9,5 +9,9 @@ namespace SimpleAI {
         public bool Evaluate(IContext ctx) {
             return !Check.Evaluate(ctx);
         }
+
+        public override string ToString() {
+            return $"!({Check})";
+        }
     }
 }

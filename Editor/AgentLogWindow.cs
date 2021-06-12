@@ -4,7 +4,9 @@ using UnityEngine;
 
 namespace SimpleAI {
     public class AgentLogWindow : EditorWindow, IAIListener {
-        public static AgentLogWindow Instance;
+        public static AgentLogWindow Instance {
+            get => HasOpenInstances<AgentLogWindow>() ? GetWindow<AgentLogWindow>("SimpleAI AIAgent Log") : null;
+        }
 
         GUIStyle style = new GUIStyle();
         Vector2 scrollPos;
@@ -13,9 +15,9 @@ namespace SimpleAI {
         [MenuItem("Tools/SimpleAI/AIAgent Log")]
         static void Init() {
             if (Instance == null) {
-                Instance = GetWindow<AgentLogWindow>("SimpleAI AIAgent Log");
-                Instance.style.richText = true;
-                Instance.style.normal.textColor = Color.white;
+                var newInstance = GetWindow<AgentLogWindow>("SimpleAI AIAgent Log");
+                newInstance.style.richText = true;
+                newInstance.style.normal.textColor = Color.white;
             }
             Instance.Show();
         }

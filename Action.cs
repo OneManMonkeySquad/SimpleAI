@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SimpleAI {
     [Serializable]
     public class Consideration {
         public int Idx;
-        [FormerlySerializedAs("curve")]
         public AnimationCurve Curve = new AnimationCurve(new Keyframe[] { new Keyframe(0, 0), new Keyframe(1, 1) });
     }
 
