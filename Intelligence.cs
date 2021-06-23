@@ -11,7 +11,7 @@ namespace SimpleAI {
             ActionSet bestActionSet = null;
 
 #if UNITY_EDITOR
-            ctx.Listener?.Log("\n");
+            ctx.Listener?.LogLine("");
 #endif
 
             foreach (var actionSet in actionSets) {
@@ -20,7 +20,7 @@ namespace SimpleAI {
                     foreach (var check in actionSet.Checks) {
                         if (!check.Evaluate(ctx)) {
 #if UNITY_EDITOR
-                            ctx.Listener?.Log($"<i>{actionSet.name}</i> <color=grey>failed {check}</color>\n");
+                            ctx.Listener?.LogLine($"<color=grey><i>{actionSet.name}</i></color> failed <i>{check}</i>");
 #endif
                             checksFailed = true;
                             break;
@@ -37,14 +37,14 @@ namespace SimpleAI {
 
                     if (score <= bestScore) {
 #if UNITY_EDITOR
-                        ctx.Listener?.Log($"<i>{action.name}</i> <color=grey>{score:0.00}</color>\n");
+                        ctx.Listener?.LogLine($"<color=grey><i>{action.name}</i></color> {score:0.00}");
 #endif
                         continue;
                     }
 
                     if (!action.CheckProceduralPreconditions(ctx)) {
 #if UNITY_EDITOR
-                        ctx.Listener?.Log($"<i>{action.name}</i> <color=grey>precondition</color>\n");
+                        ctx.Listener?.LogLine($"<color=grey><i>{action.name}</i></color> precondition");
 #endif
                         continue;
                     }
@@ -53,7 +53,7 @@ namespace SimpleAI {
                     bestAction = action;
                     bestActionSet = actionSet;
 #if UNITY_EDITOR
-                    ctx.Listener?.Log($"<i>{action.name}</i> <color=green>{score:0.00}</color>\n");
+                    ctx.Listener?.LogLine($"<color=green><b><i>{action.name}</i></color> {score:0.00}</b>");
 #endif
                 }
             }

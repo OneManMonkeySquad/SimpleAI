@@ -3,7 +3,11 @@
 namespace SimpleAI {
 #if UNITY_EDITOR
     public interface IAIListener {
-        void Log(string text);
+        void LogLine(string text);
+    }
+
+    public static class AIDebugger {
+        public static IAIListener Active;
     }
 #endif
 

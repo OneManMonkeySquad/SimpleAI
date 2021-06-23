@@ -62,7 +62,7 @@ namespace SimpleAI {
             var betterActionPair = Intelligence.SelectAction(ctx, scoreThreshold);
             if (betterActionPair.Item1 == null || betterActionPair.Item1 == CurrentAction) {
 #if UNITY_EDITOR
-                ctx.Listener?.Log($"Keep current action <i>{CurrentAction.name}</i>\n");
+                ctx.Listener?.LogLine($"<b><i>{CurrentAction.name}</i></b>");
 #endif
                 return;
             }
@@ -102,7 +102,7 @@ namespace SimpleAI {
 
         void SwitchToAction((ActionBase, ActionSet) actionPair, T ctx) {
 #if UNITY_EDITOR
-            ctx.Listener?.Log($"<b>{CurrentAction?.name} -> {actionPair.Item1.name}</b>\n");
+            ctx.Listener?.LogLine($"<b>{CurrentAction?.name} -> {actionPair.Item1.name}</b>");
 #endif
 
             Reset(ctx);
