@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CareBoo.Serially;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -37,9 +38,12 @@ namespace SimpleAI.EQS {
 
         public Vector3 Resolve(QueryContext ctx) {
             switch (ctx) {
-                case QueryContext.Querier: return Querier;
-                case QueryContext.Target: return Target;
-                default: throw new Exception("case missing");
+                case QueryContext.Querier:
+                    return Querier;
+                case QueryContext.Target:
+                    return Target;
+                default:
+                    throw new Exception("case missing");
             }
         }
     }
@@ -50,10 +54,10 @@ namespace SimpleAI.EQS {
     public class Query : ScriptableObject {
         public QueryContext Around;
         [SerializeReference]
-        [SerializeReferenceButton]
+        [ShowSerializeReference]
         public IGenerator Generator;
         [SerializeReference]
-        [SerializeReferenceButton]
+        [ShowSerializeReference]
         public List<ITest> Tests;
 
         public Task<Item> ExecuteAsync(QueryRunMode mode, QueryRunContext ctx) {

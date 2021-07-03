@@ -1,9 +1,10 @@
+using CareBoo.Serially;
 using UnityEngine;
 
 namespace SimpleAI {
     public class NotCheck : ICheckBase {
         [SerializeReference]
-        [SerializeReferenceButton]
+        [ShowSerializeReference]
         public ICheckBase Check;
 
         public bool Evaluate(IContext ctx) {

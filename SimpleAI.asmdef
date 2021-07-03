@@ -1,3 +1,16 @@
 {
-	"name": "SimpleAI"
+    "name": "SimpleAI",
+    "rootNamespace": "",
+    "references": [
+        "GUID:955c384325353454a9862e6ec136c9bb"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
