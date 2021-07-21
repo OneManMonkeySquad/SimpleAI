@@ -12,6 +12,7 @@ namespace SimpleAI {
     public abstract class ActionBase : ScriptableObject {
         public Consideration[] considerations;
 
+        /// [0,1] - highter is better
         public float Score(IContext ctx) {
             if (considerations == null || considerations.Length == 0)
                 return 1;

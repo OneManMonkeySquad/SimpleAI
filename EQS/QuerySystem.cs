@@ -16,8 +16,13 @@ namespace SimpleAI.EQS {
         public static QuerySystem Main {
             get {
                 if (main == null) {
-                    var go = new GameObject("QuerySystem");
-                    main = go.AddComponent<QuerySystem>();
+                    var go = GameObject.Find("QuerySystem");
+                    if (go != null) {
+                        main = go.GetComponent<QuerySystem>();
+                    } else {
+                        go = new GameObject("QuerySystem");
+                        main = go.AddComponent<QuerySystem>();
+                    }
                 }
                 return main;
             }
@@ -33,6 +38,7 @@ namespace SimpleAI.EQS {
             jobs.Enqueue(job);
         }
 
+        List<Item> tempListItems = new List<Item>();
         public void Execute(Query query, QueryRunMode mode, QueryRunContext ctx, QueryExecuteDone done) {
             var num = query.Generator.GenerateItemsNonAlloc(query.Around, ctx, items);
             for (var i = 0; i < num; ++i) {
@@ -52,26 +58,48 @@ namespace SimpleAI.EQS {
             }
 
             switch (mode) {
-                case QueryRunMode.Best:
-                    var bestScore = 0f;
-                    var bestIdx = 0;
-                    for (int i = 0; i < num; ++i) {
-                        var item = items[i];
-                        if (item.Score > bestScore) {
-                            bestScore = item.Score;
-                            bestIdx = i;
+                case QueryRunMode.Best: {
+                        var bestScore = 0f;
+                        var bestIdx = 0;
+                        for (int i = 0; i < num; ++i) {
+                            var item = items[i];
+                            if (item.Score > bestScore) {
+                                bestScore = item.Score;
+                                bestIdx = i;
+                            }
                         }
+                        done(items[bestIdx]);
+                        break;
                     }
-                    done(items[bestIdx]);
-                    break;
+                case QueryRunMode.RandomBest25Pct: {
+                        var bestScore = 0f;
+                        for (int i = 0; i < num; ++i) {
+                            var item = items[i];
+                            if (item.Score > bestScore) {
+                                bestScore = item.Score;
+                            }
+                        }
 
-                case QueryRunMode.All:
-                    for (int i = 0; i < num; ++i) {
-                        var item = items[i];
-                        done(item);
+                        var threshold = Mathf.Max(bestScore - 0.25f, 0);
+
+                        tempListItems.Clear();
+                        for (int i = 0; i < num; ++i) {
+                            var item = items[i];
+                            if (item.Score >= threshold) {
+                                tempListItems.Add(item);
+                            }
+                        }
+
+                        done(tempListItems[UnityEngine.Random.Range(0, tempListItems.Count)]);
+                        break;
                     }
-                    break;
-
+                case QueryRunMode.All: {
+                        for (int i = 0; i < num; ++i) {
+                            var item = items[i];
+                            done(item);
+                        }
+                        break;
+                    }
                 default:
                     throw new Exception("case missing");
             }

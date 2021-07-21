@@ -5,11 +5,19 @@ using UnityEngine.AI;
 namespace SimpleAI.EQS {
     [Serializable]
     public class NavmeshDistanceTest : ITest {
+        public enum ScoreMode {
+            PreferGreater,
+            PreferLower,
+            PeferExact
+        }
+
         public QueryContext To;
+        public int WalkableMask = NavMesh.AllAreas;
+
+        [Header("Score")]
         [Range(1, 1000)]
         public float MaxDistance = 100;
-        public DistanceTestMode Mode = DistanceTestMode.PreferGreater;
-        public int WalkableMask = NavMesh.AllAreas;
+        public ScoreMode Mode = ScoreMode.PreferGreater;
 
         public float RuntimeCost => 20;
 
@@ -28,13 +36,12 @@ namespace SimpleAI.EQS {
                 return 1;
 
             var distance = GetPathLength(path);
-            if (Mode == DistanceTestMode.PeferExact) {
+            if (Mode == ScoreMode.PeferExact) {
                 var a = Mathf.Clamp01(Mathf.Abs(distance - MaxDistance) / MaxDistance);
                 return 1f - a;
-            }
-            else {
+            } else {
                 var a = Mathf.Clamp01(distance / MaxDistance);
-                if (Mode == DistanceTestMode.PreferLower) {
+                if (Mode == ScoreMode.PreferLower) {
                     a = 1f - a;
                 }
                 return a;

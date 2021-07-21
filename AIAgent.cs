@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace SimpleAI {
-    public class AIAgent<T> where T : IContext {
+    public class AIAgent<T> where T : class, IContext {
         public ActionBase CurrentAction {
             get;
             internal set;
@@ -17,7 +17,6 @@ namespace SimpleAI {
 
         ActionSet currentActionSet;
         Coroutine currentActionCoroutine;
-        bool hasCurrentActionEnded;
 
         readonly float evaluationTickRate;
         float nextReevaluationTime;
@@ -29,10 +28,6 @@ namespace SimpleAI {
 
         /// Call this every frame. Might switch to a new action.
         public void Tick(T ctx) {
-            if (hasCurrentActionEnded) {
-                CurrentAction = null;
-            }
-
             if (CurrentAction == null) {
                 if (Time.time < nextReevaluationTime)
                     return;
@@ -40,8 +35,12 @@ namespace SimpleAI {
                 nextReevaluationTime = Time.time + evaluationTickRate;
 
                 var nextActionPair = Intelligence.SelectAction(ctx, 0);
-                if (nextActionPair.Item1 == null)
-                    return;
+                if (nextActionPair.Item1 == null) {
+                    if (Intelligence.DefaultAction == null)
+                        return;
+
+                    nextActionPair = (Intelligence.DefaultAction, null);
+                }
 
                 SwitchToAction(nextActionPair, ctx);
             } else if (Time.time >= nextReevaluationTime) {
@@ -58,11 +57,12 @@ namespace SimpleAI {
 
             nextReevaluationTime = Time.time + evaluationTickRate;
 
-            var scoreThreshold = CurrentAction.Score(ctx) * currentActionSet.finalWeight * 1.3f; // 30% higher than our current score
+            var setWeight = currentActionSet != null ? currentActionSet.finalWeight : 1;
+            var scoreThreshold = CurrentAction.Score(ctx) * setWeight * 1.3f; // 30% higher than our current score
             var betterActionPair = Intelligence.SelectAction(ctx, scoreThreshold);
             if (betterActionPair.Item1 == null || betterActionPair.Item1 == CurrentAction) {
 #if UNITY_EDITOR
-                ctx.Listener?.LogLine($"<b><i>{CurrentAction.name}</i></b>");
+                AIDebugger.LogLine(ctx, $"<b><i>{CurrentAction.name}</i></b>");
 #endif
                 return;
             }
@@ -87,6 +87,18 @@ namespace SimpleAI {
             float bestScore = 0;
 
             foreach (var smartObject in smartObjects) {
+                if (smartObject.Checks != null) {
+                    var checksFailed = false;
+                    foreach (var check in smartObject.Checks) {
+                        if (!check.Evaluate(ctx)) {
+                            checksFailed = true;
+                            break;
+                        }
+                    }
+                    if (checksFailed)
+                        continue;
+                }
+
                 var score = smartObject.Score(ctx);
                 if (score < 0.01f)
                     continue;
@@ -102,7 +114,7 @@ namespace SimpleAI {
 
         void SwitchToAction((ActionBase, ActionSet) actionPair, T ctx) {
 #if UNITY_EDITOR
-            ctx.Listener?.LogLine($"<b>{CurrentAction?.name} -> {actionPair.Item1.name}</b>");
+            AIDebugger.LogLine(ctx, $"<b>{CurrentAction?.name} -> {actionPair.Item1.name}</b>");
 #endif
 
             Reset(ctx);
@@ -112,7 +124,6 @@ namespace SimpleAI {
 
             ctx.CoroutineTarget.StartCoroutine(CoroutineWrapper(ctx.CoroutineTarget, actionPair.Item1.StartAction(ctx)));
 
-            hasCurrentActionEnded = false;
             CurrentAction = actionPair.Item1;
             currentActionSet = actionPair.Item2;
         }
@@ -122,7 +133,7 @@ namespace SimpleAI {
 
             currentActionCoroutine = actor.StartCoroutine(func);
             yield return currentActionCoroutine;
-            hasCurrentActionEnded = true;
+            CurrentAction = null;
         }
     }
 }

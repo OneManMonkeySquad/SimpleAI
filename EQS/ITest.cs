@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace SimpleAI.EQS {
     public interface ITest {
         /// <summary>

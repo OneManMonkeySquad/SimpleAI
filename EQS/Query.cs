@@ -14,6 +14,7 @@ namespace SimpleAI.EQS {
 
     public struct Item {
         public Vector3 Point;
+        /// [0,1]
         public float Score;
     }
 

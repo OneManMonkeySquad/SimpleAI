@@ -4,18 +4,24 @@ namespace SimpleAI {
 #if UNITY_EDITOR
     public interface IAIListener {
         void LogLine(string text);
+
     }
 
     public static class AIDebugger {
+        public static IContext CurrentDebugTarget;
         public static IAIListener Active;
+
+        public static void LogLine(IContext ctx, string text) {
+            if (ctx != CurrentDebugTarget || Active == null)
+                return;
+
+            Active.LogLine(text);
+        }
     }
 #endif
 
     public interface IContext {
         MonoBehaviour CoroutineTarget { get; }
-#if UNITY_EDITOR
-        IAIListener Listener { get; }
-#endif
 
         float GetCurrentConsiderationScore(int considerationIdx);
         /// Used by the inspector to display possible considerations.

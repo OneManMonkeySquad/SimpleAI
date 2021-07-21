@@ -2,11 +2,17 @@ using System;
 using UnityEngine;
 
 namespace SimpleAI.EQS {
-    [UnityEngine.Scripting.APIUpdating.MovedFrom(false, null, "Assembly-CSharp")]
+    // Attention: might attract police..
     [Serializable]
-    public class GridGenerator : IGenerator {
+    public class DonutGenerator : IGenerator {
         [Range(1, 20)]
-        public int Radius = 4;
+        public int MinRadius = 4;
+        [Range(1, 20)]
+        public int MaxRadius = 6;
+        [Range(1, 5)]
+        public int RadiusIncrements = 2;
+        [Range(15, 90)]
+        public float AngleIncrements = 30;
         [Range(0.1f, 10f)]
         public float Padding = 1;
 
@@ -14,14 +20,14 @@ namespace SimpleAI.EQS {
             int num = 0;
 
             var p = ctx.Resolve(around);
-            for (int x = -Radius; x <= Radius; ++x) {
-                for (int y = -Radius; y <= Radius; ++y) {
+            for (int radius = MinRadius; radius <= MaxRadius; radius += RadiusIncrements) {
+                for (float angle = 0; angle < 360; angle += AngleIncrements) {
                     if (num >= items.Length) {
                         Debug.LogWarning("Exhausted number of items");
                         return num;
                     }
 
-                    items[num].Point = p + new Vector3(x * Padding, 0, y * Padding);
+                    items[num].Point = p + Quaternion.AngleAxis(angle, Vector3.up) * Vector3.forward * radius;
                     ++num;
                 }
             }

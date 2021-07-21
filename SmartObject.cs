@@ -3,16 +3,17 @@ using UnityEngine;
 
 namespace SimpleAI {
     public abstract class SmartObjectBase : MonoBehaviour {
-        public Consideration[] considerations;
+        public CheckBase[] Checks;
+        public Consideration[] Considerations;
 
         public float Score(IContext ctx) {
-            if (considerations.Length == 0)
+            if (Considerations.Length == 0)
                 return 1;
 
             var totalScore = 1f;
 
-            var modificationFactor = 1f - 1f / considerations.Length;
-            foreach (var consideration in considerations) {
+            var modificationFactor = 1f - 1f / Considerations.Length;
+            foreach (var consideration in Considerations) {
                 var score = ctx.GetCurrentConsiderationScore(consideration.Idx);
                 score = consideration.Curve.Evaluate(score);
 

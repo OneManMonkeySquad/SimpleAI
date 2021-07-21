@@ -12,19 +12,32 @@ namespace SimpleAI {
             public float AsFloat;
         }
 
-        Dictionary<BlackboardKey, Value> Data = new Dictionary<BlackboardKey, Value>();
+
+        List<BlackboardKey> Keys = new List<BlackboardKey>();
+        List<Value> Values = new List<Value>();
 
         public void SetFloat(BlackboardKey key, float val) {
             Assert.IsNotNull(key);
 
-            Data[key] = new Value() { AsFloat = val };
+            var newValue = new Value() { AsFloat = val };
+
+            for (int i = 0; i < Keys.Count; ++i) {
+                if (Keys[i] == key) {
+                    Values[i] = newValue;
+                    return;
+                }
+            }
+
+            Keys.Add(key);
+            Values.Add(newValue);
         }
 
         public float GetFloat(BlackboardKey key) {
-            if (!Data.TryGetValue(key, out Value val))
-                return 0;
-
-            return val.AsFloat;
+            for (int i = 0; i < Keys.Count; ++i) {
+                if (Keys[i] == key)
+                    return Values[i].AsFloat;
+            }
+            return default(float);
         }
     }
 }

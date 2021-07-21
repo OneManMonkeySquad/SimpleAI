@@ -2,15 +2,22 @@ using System;
 using UnityEngine;
 
 namespace SimpleAI.EQS {
-    public enum DistanceTestMode {
-        PreferGreater,
-        PreferLower,
-        PeferExact
+
+    public enum FilterType {
+        Minimum,
+        Maximum
     }
+
 
     [UnityEngine.Scripting.APIUpdating.MovedFrom(false, null, "Assembly-CSharp")]
     [Serializable]
     public class DistanceTest : ITest {
+        public enum DistanceTestMode {
+            PreferGreater,
+            PreferLower,
+            PeferExact
+        }
+
         public QueryContext To;
         [Range(1, 1000)]
         public float MaxDistance = 100;
@@ -25,8 +32,7 @@ namespace SimpleAI.EQS {
             if (Mode == DistanceTestMode.PeferExact) {
                 var a = Mathf.Clamp01(Mathf.Abs(distance - MaxDistance) / MaxDistance);
                 return 1f - a;
-            }
-            else {
+            } else {
                 var a = Mathf.Clamp01(distance / MaxDistance);
                 if (Mode == DistanceTestMode.PreferLower) {
                     a = 1f - a;
