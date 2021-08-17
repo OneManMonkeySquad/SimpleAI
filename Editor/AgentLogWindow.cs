@@ -34,6 +34,10 @@ namespace SimpleAI {
         }
 
         public void LogLine(string text) {
+            if (logLines.Length > 1000) {
+                logLines.Remove(0, logLines.Length - 1000);
+            }
+
             logLines.AppendLine(text);
             scrollPos.y = float.PositiveInfinity;
 

@@ -37,7 +37,7 @@ namespace SimpleAI {
 
                     if (score < minScore) {
 #if UNITY_EDITOR
-                        AIDebugger.LogLine(ctx, $"<color=grey><i>{action.name}</i></color> {score:0.00}");
+                        AIDebugger.LogLine(ctx, $"<color=grey><i>{action.name}</i></color> {score:0.00} under min. score {minScore:0.00}");
 #endif
                         continue;
                     }

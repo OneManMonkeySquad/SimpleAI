@@ -10,8 +10,8 @@ namespace SimpleAI {
     }
 
     public abstract class Check<T> : CheckBase, ICheckBase {
-        public override bool Evaluate(IContext ctx) => Foo((T)ctx);
+        public override bool Evaluate(IContext ctx) => Evaluate((T)ctx);
 
-        public abstract bool Foo(T ctx);
+        public abstract bool Evaluate(T ctx);
     }
 }

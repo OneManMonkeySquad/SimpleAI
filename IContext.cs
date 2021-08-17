@@ -4,7 +4,6 @@ namespace SimpleAI {
 #if UNITY_EDITOR
     public interface IAIListener {
         void LogLine(string text);
-
     }
 
     public static class AIDebugger {
