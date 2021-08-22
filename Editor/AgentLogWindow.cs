@@ -10,15 +10,14 @@ namespace SimpleAI {
         }
 
         static void PlayModeStateChanged(PlayModeStateChange stateChange) {
-            if (stateChange == PlayModeStateChange.EnteredPlayMode && AgentLogWindow.HasInstance) {
+            if (stateChange == PlayModeStateChange.EnteredPlayMode && AgentLogWindow.Instance != null) {
                 AgentLogWindow.Instance.OnEnterPlayMode();
             }
         }
     }
 
     public class AgentLogWindow : EditorWindow, IAIListener {
-        public static bool HasInstance => HasOpenInstances<AgentLogWindow>();
-        public static AgentLogWindow Instance => GetWindow<AgentLogWindow>("SimpleAI AIAgent Log");
+        public static AgentLogWindow Instance => Object.FindObjectOfType<AgentLogWindow>();
 
         Vector2 scrollPos;
         StringBuilder logLines = new StringBuilder();
@@ -30,7 +29,8 @@ namespace SimpleAI {
 
         [MenuItem("Tools/SimpleAI/AIAgent Log")]
         static void Init() {
-            Instance.Show();
+            var instance = GetWindow<AgentLogWindow>("SimpleAI AIAgent Log");
+            instance.Show();
         }
 
         public void LogLine(string text) {
