@@ -20,7 +20,7 @@ namespace SimpleAI {
                     foreach (var check in actionSet.Checks) {
                         if (!check.Evaluate(ctx)) {
 #if UNITY_EDITOR
-                            AIDebugger.LogLine(ctx, $"<color=grey><i>[{actionSet.name}]</i></color> failed <i>{check}</i>");
+                            AIDebugger.LogLine(ctx, $"<color=grey><i>[{actionSet.name}]</i> failed <i>{check}</i></color>");
 #endif
                             checksFailed = true;
                             break;
@@ -37,13 +37,13 @@ namespace SimpleAI {
 
                     if (score < minScore) {
 #if UNITY_EDITOR
-                        AIDebugger.LogLine(ctx, $"<color=grey><i>{action.name}</i></color> {score:0.00} under min. score {minScore:0.00}");
+                        AIDebugger.LogLine(ctx, $"<i>{action.name}</i> {score:0.00} < {minScore:0.00}");
 #endif
                         continue;
                     }
                     if (!action.CheckProceduralPreconditions(ctx)) {
 #if UNITY_EDITOR
-                        AIDebugger.LogLine(ctx, $"<color=grey><i>{action.name}</i></color> precondition");
+                        AIDebugger.LogLine(ctx, $"<color=grey><i>{action.name}</i> precondition</color>");
 #endif
                         continue;
                     }
