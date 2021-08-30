@@ -122,17 +122,19 @@ namespace SimpleAI {
             if (actionPair.Item1 == null)
                 return;
 
-            ctx.CoroutineTarget.StartCoroutine(CoroutineWrapper(ctx.CoroutineTarget, actionPair.Item1.StartAction(ctx)));
+            ctx.CoroutineTarget.StartCoroutine(CoroutineWrapper(ctx, actionPair.Item1.StartAction(ctx)));
 
             CurrentAction = actionPair.Item1;
             currentActionSet = actionPair.Item2;
         }
 
-        IEnumerator CoroutineWrapper(MonoBehaviour actor, IEnumerator func) {
+        IEnumerator CoroutineWrapper(T ctx, IEnumerator func) {
             Assert.IsNull(currentActionCoroutine);
 
-            currentActionCoroutine = actor.StartCoroutine(func);
+            currentActionCoroutine = ctx.CoroutineTarget.StartCoroutine(func);
             yield return currentActionCoroutine;
+
+            CurrentAction.StopAction(ctx);
             CurrentAction = null;
         }
     }
