@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SimpleAI {
     public abstract class SmartObjectBase : MonoBehaviour {
@@ -32,6 +33,15 @@ namespace SimpleAI {
 
         public abstract IEnumerator StartAction(IContext ctx);
         public abstract void StopAction(IContext ctx);
+
+        void OnValidate() {
+            foreach (var check in Checks) {
+                Assert.IsNotNull(check);
+            }
+            foreach (var consideration in Considerations) {
+                Assert.IsNotNull(consideration);
+            }
+        }
     }
 
     public abstract class SmartObject<T> : SmartObjectBase, IBoundToContextType<T> where T : IContext, new() {

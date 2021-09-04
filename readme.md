@@ -8,32 +8,31 @@ Coroutine-based utility AI for [Unity3d](https://unity3d.com).
 ```cs
 // A context contains all the data that's relevant for the AI to run.
 public class ActorAIContext : IContext {
-    public Actor Actor;
-#if UNITY_EDITOR
-    public IAIListener Listener { get; set; }
-#endif
     public MonoBehaviour CoroutineTarget => Actor;
-    public Blackboard Blackboard = new Blackboard();
+
+    /// The Pawn this AIAgent controls
+    public Actor Actor;
 
     public Actor BestTarget;
     public SmartObjectBase BestSmartObject;
 
     public bool IsArmed = false;
-    public float Threat;
 
-    public float GetCurrentConsiderationScore(int considerationIdx) =>
-        considerationIdx switch {
+    // The next 2 methods are required for the inspector to display "considerations" for an action
+    public float GetCurrentConsiderationScore(int considerationIdx)
+        => considerationIdx switch {
             0 => 1,
             1 => BestTarget != null ? 1 : 0,
             2 => IsArmed ? 1 : 0,
-            _ => throw new ArgumentException("", "considerationIdx")
+            _ => throw new Exception("case missing")
         };
 
-    public string[] GetConsiderationDescriptions() => new string[] {
-        "Constant",
-        "Has Target",
-        "Is Armed",
-    };
+    public string[] GetConsiderationDescriptions() 
+        => new string[] {
+            "Constant",
+            "Has Target",
+            "Is Armed",
+        };
 }
 
 public class Actor : MonoBehaviour {
@@ -96,3 +95,32 @@ public class AttackAction : Action<ActorAIContext> {
 
 ## Environment Query System
 ![Query](Docs/Query.png)
+
+```cs
+public class MoveAndFireAction : Action<ActorAIContext> {
+    public QueryRunMode RunMode = QueryRunMode.Best;
+    public Query Query;
+
+    public override IEnumerator StartAction(ActorAIContext ctx) {
+        // Give the EQS some context
+        var queryCtx = new QueryRunContext() {
+            Querier = ctx.Actor.transform.position,
+            Target = ctx.TargetActorInfo.LastKnownLocation
+        };
+
+        Vector3 targetPosition;
+        {
+            // Run and wait for result
+            var moveToPosition = Query.ExecuteAsync(RunMode, queryCtx);
+            yield return moveToPosition.AsIEnumerator();
+
+            if (moveToPosition.Result.Score < 0.01f)
+                yield break; // No good position found
+
+            targetPosition = moveToPosition.Result.Point;
+        }
+
+        // ...
+    }
+ }
+```

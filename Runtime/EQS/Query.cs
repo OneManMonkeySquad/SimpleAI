@@ -34,19 +34,15 @@ namespace SimpleAI.EQS {
     }
 
     public struct QueryRunContext {
-        public Vector3 Querier;
-        public Vector3 Target;
+        public Vector3[] Querier;
+        public Vector3[] Target;
 
-        public Vector3 Resolve(QueryContext ctx) {
-            switch (ctx) {
-                case QueryContext.Querier:
-                    return Querier;
-                case QueryContext.Target:
-                    return Target;
-                default:
-                    throw new Exception("case missing");
-            }
-        }
+        public Vector3[] Resolve(QueryContext ctx)
+            => ctx switch {
+                QueryContext.Querier => Querier,
+                QueryContext.Target => Target,
+                _ => throw new Exception("case missing")
+            };
     }
 
     public delegate void QueryExecuteDone(Item item);

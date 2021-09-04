@@ -34,15 +34,15 @@ namespace SimpleAI {
         }
 
         public void LogLine(string text) {
-            if (logLines.Length > 1000) {
+            var linesToKeep = 1000;
+            if (logLines.Length > linesToKeep) {
                 var off = 0;
-                for (; off < logLines.Length - 1; ++off) {
-                    if (logLines[off] == '\n' && logLines[off + 1] == '\n') {
+                for (; off < linesToKeep - 1; ++off) {
+                    if (logLines[off] == '\n' && logLines[off + 1] == '\n')
                         break;
-                    }
                 }
 
-                logLines.Remove(off, logLines.Length - (1000 - off));
+                logLines.Remove(off, System.Math.Min(logLines.Length, linesToKeep - off));
             }
 
             logLines.AppendLine(text);

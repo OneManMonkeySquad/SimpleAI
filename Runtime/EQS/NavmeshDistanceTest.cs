@@ -24,28 +24,34 @@ namespace SimpleAI.EQS {
         NavMeshPath path;
 
         public float Run(ref Item item, QueryRunContext ctx) {
-            var from = item.Point;
-            var to = ctx.Resolve(To);
-
             if (path == null) {
+                // Not allowed to be called in ctor
                 path = new NavMeshPath();
             }
 
-            path.ClearCorners();
-            if (!NavMesh.CalculatePath(from, to, WalkableMask, path))
-                return 1;
+            var from = item.Point;
+            var tos = ctx.Resolve(To);
 
-            var distance = GetPathLength(path);
-            if (Mode == ScoreMode.PeferExact) {
-                var a = Mathf.Clamp01(Mathf.Abs(distance - MaxDistance) / MaxDistance);
-                return 1f - a;
-            } else {
-                var a = Mathf.Clamp01(distance / MaxDistance);
-                if (Mode == ScoreMode.PreferLower) {
-                    a = 1f - a;
+            var c = 1f;
+            foreach (var to in tos) {
+                path.ClearCorners();
+                if (!NavMesh.CalculatePath(from, to, WalkableMask, path))
+                    return 0;
+
+                var distance = GetPathLength(path);
+
+                if (Mode == ScoreMode.PeferExact) {
+                    var a = Mathf.Clamp01(Mathf.Abs(distance - MaxDistance) / MaxDistance);
+                    c *= a;
+                } else {
+                    var a = Mathf.Clamp01(distance / MaxDistance);
+                    if (Mode == ScoreMode.PreferGreater) {
+                        a = 1f - a;
+                    }
+                    c *= a;
                 }
-                return a;
             }
+            return 1f - c;
         }
 
         static float GetPathLength(NavMeshPath path) {

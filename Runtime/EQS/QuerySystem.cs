@@ -40,6 +40,9 @@ namespace SimpleAI.EQS {
 
         List<Item> tempListItems = new List<Item>();
         public void Execute(Query query, QueryRunMode mode, QueryRunContext ctx, QueryExecuteDone done) {
+            if (query.Generator == null)
+                return;
+
             var num = query.Generator.GenerateItemsNonAlloc(query.Around, ctx, items);
             for (var i = 0; i < num; ++i) {
                 var totalScore = 1f;

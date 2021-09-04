@@ -83,13 +83,26 @@ namespace SimpleAI {
 
         /// Select the best (and possible) SmartObject from a list of SmartObjects.
         public SmartObjectBase SelectSmartObject(T ctx, List<SmartObjectBase> smartObjects) {
+            Assert.IsNotNull(ctx);
+            Assert.IsNotNull(smartObjects);
+            if (ctx == null || smartObjects == null)
+                return null;
+
             SmartObjectBase bestSmartObject = null;
             float bestScore = 0;
 
             foreach (var smartObject in smartObjects) {
+                if (smartObject == null) {
+                    Debug.LogWarning("SmartObject null");
+                    continue;
+                }
+
                 if (smartObject.Checks != null) {
                     var checksFailed = false;
                     foreach (var check in smartObject.Checks) {
+                        if (check == null)
+                            continue;
+
                         if (!check.Evaluate(ctx)) {
                             checksFailed = true;
                             break;

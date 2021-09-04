@@ -2,7 +2,6 @@ using System;
 using UnityEngine.AI;
 
 namespace SimpleAI.EQS {
-    [UnityEngine.Scripting.APIUpdating.MovedFrom(false, null, "Assembly-CSharp")]
     [Serializable]
     public class ProjectToNavmeshTest : ITest {
         public float MaxDistance = 1;
