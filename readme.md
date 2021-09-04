@@ -12,6 +12,10 @@ Note that the AI does not plan in any way. It is purely reactionary. I'm being s
 
 There's support for multiple types of AI (Intelligences - soldiers, zombies, animals, ...) in the same project. There's a simple EQS system to search for good positions based on utility functions.
 
+_If it's this simple why wouldn't I want to do this myself?_ Well big chief, this library is as minimal as it gets. So there's no bloat or features you won't use. The logic is simple and not spectacular yet the details matter. There's  tooling which is import as the biggest gripe with the this AI is the scoring and why an Action was chosen/interrupted.
+
+_Well if utility based scoring is hard to balance why not use a tree, for say, behaviour?_ Because it's easy to extend and tweak. No need to think about rules, just give the AI some context, Actions and considerations/checks and watch it go. Everything can be tweaked at runtime and there's a runtime debugger to see why an Action was chosen. Actions themselves can be as simple or complex as required. From a simple goto, animate, SmartObject to a cutscene written in plain C#.
+
 ![Action](Docs/Action.png)
 ![ActionSet](Docs/ActionSet.png)
 ![Parts](Docs/Parts.png)
