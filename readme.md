@@ -107,6 +107,9 @@ public class AttackAction : Action<ActorAIContext> {
 ## Environment Query System
 ![Query](Docs/Query.png)
 
+To test a query create a test agent under _SimpleAI/Create EQS Test Agent_ and set its Query attribute.
+
+This is how you query for a position in code:
 ```cs
 public class MoveAndFireAction : Action<ActorAIContext> {
     public QueryRunMode RunMode = QueryRunMode.Best;
