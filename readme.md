@@ -1,5 +1,16 @@
 # SimpleAI
-Coroutine-based utility AI for [Unity3d](https://unity3d.com).
+Coroutine-based utility AI for [Unity3d](https://unity3d.com). Includes an Unreal inspired EQS system.
+
+## Overview
+This library is a framework for AI and does not contain any behaviour. The API surface is minimal and you should be up and running in no time.
+
+Every AIAgent has a set of possible Actions and at most one coroutine. Which Action is executed is choosen by utility functions. The Action is started by running its coroutine. Actions can be interrupted if there's an Action with a significantly higher utilitity. When iterrupted the coroutine is stopped and a virtual function on the Action is called to cleanup.
+
+Compared to state-of-the-art behaviour trees this solution is as lightweight as it gets. As simple and cheap as a FSM but modular, extensible and comfy to write code for. There's no editor to learn, everything is boring old ScriptableObjects and plain classes. On the other hand it's harder to balance as Actions are chosen by fuzzy scores instead of rigid if-then rules. Out of the box designers can only tweak when actions are chosen/interrupted and tweak action parameters, nothing more.
+
+Note that the AI does not plan in any way. It is purely reactionary. I'm being shot so I'm in combat now. I'm almost dead so I'm running away now. If you need something like this look into GOAP or the more modern HTN.
+
+There's support for multiple types of AI (Intelligences - soldiers, zombies, animals, ...) in the same project. There's a simple EQS system to search for good positions based on utility functions.
 
 ![Action](Docs/Action.png)
 ![ActionSet](Docs/ActionSet.png)
