@@ -104,6 +104,8 @@ public class AttackAction : Action<ActorAIContext> {
 ## Debugging
 ![Logger](Docs/Logger.png)
 
+Under _SimpleAI/AIAgent Log_.
+
 ## Environment Query System
 ![Query](Docs/Query.png)
 
