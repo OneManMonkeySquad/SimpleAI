@@ -72,11 +72,11 @@ namespace SimpleAI.EQS {
                 Ctx = ctx,
                 Done = done
             };
-            QuerySystem.Main.AddQuery(job);
+            QuerySystem.Instance.AddQuery(job);
         }
 
         public void Execute(QueryRunMode mode, QueryRunContext ctx, QueryExecuteDone done) {
-            QuerySystem.Main.Execute(this, mode, ctx, done);
+            QuerySystem.Instance.Execute(this, mode, ctx, done);
         }
 
         void OnValidate() {

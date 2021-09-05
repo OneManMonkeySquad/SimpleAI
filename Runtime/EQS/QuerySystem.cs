@@ -12,22 +12,16 @@ namespace SimpleAI.EQS {
             public QueryExecuteDone Done;
         }
 
-        static QuerySystem main;
-        public static QuerySystem Main {
+        static QuerySystem instance;
+        public static QuerySystem Instance {
             get {
-                if (main == null) {
-                    var go = GameObject.Find("QuerySystem");
-                    if (go != null) {
-                        main = go.GetComponent<QuerySystem>();
-                    } else {
-                        go = new GameObject("QuerySystem");
-                        main = go.AddComponent<QuerySystem>();
-                    }
-                }
-                return main;
+                if (instance == null)
+                    throw new Exception("No QuerySystem instance found");
+
+                return instance;
             }
             internal set {
-                main = value;
+                instance = value;
             }
         }
 
@@ -106,6 +100,10 @@ namespace SimpleAI.EQS {
                 default:
                     throw new Exception("case missing");
             }
+        }
+
+        void Awake() {
+            instance = this;
         }
 
         void Update() {
