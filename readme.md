@@ -1,5 +1,20 @@
 # SimpleAI
-Coroutine-based utility AI for [Unity3d](https://unity3d.com).
+Coroutine-based utility AI for [Unity3d](https://unity3d.com). Includes an Unreal inspired EQS system.
+
+## Overview
+This library is a framework for AI and does not contain any behaviour. The API surface is minimal and you should be up and running in no time.
+
+Every AIAgent has a set of possible Actions and at most one coroutine. Which Action is executed is choosen by utility functions. The Action is started by running its coroutine. Actions can be interrupted if there's an Action with a significantly higher utilitity. When iterrupted the coroutine is stopped and a virtual function on the Action is called to cleanup.
+
+Compared to state-of-the-art behaviour trees this solution is as lightweight as it gets. As simple and cheap as a FSM but modular, extensible and comfy to write code for. There's no editor to learn, everything is boring old ScriptableObjects and plain classes. On the other hand it's harder to balance as Actions are chosen by fuzzy scores instead of rigid if-then rules. Out of the box designers can only tweak when actions are chosen/interrupted and tweak action parameters, nothing more.
+
+Note that the AI does not plan in any way. It is purely reactionary. I'm being shot so I'm in combat now. I'm almost dead so I'm running away now. If you need something like this look into GOAP or the more modern HTN.
+
+There's support for multiple types of AI (Intelligences - soldiers, zombies, animals, ...) in the same project. There's a simple EQS system to search for good positions based on utility functions.
+
+_If it's this simple why wouldn't I want to do this myself?_ Well big chief, this library is as minimal as it gets. So there's no bloat or features you won't use. The logic is simple and not spectacular yet the details matter. There's  tooling which is import as the biggest gripe with the this AI is the scoring and why an Action was chosen/interrupted.
+
+_Well if utility based scoring is hard to balance why not use a tree, for say, behaviour?_ Because it's easy to extend and tweak. No need to think about rules, just give the AI some context, Actions and considerations/checks and watch it go. Everything can be tweaked at runtime and there's a runtime debugger to see why an Action was chosen. Actions themselves can be as simple or complex as required. From a simple goto, animate, SmartObject to a cutscene written in plain C#.
 
 ![Action](Docs/Action.png)
 ![ActionSet](Docs/ActionSet.png)
@@ -93,9 +108,14 @@ public class AttackAction : Action<ActorAIContext> {
 ## Debugging
 ![Logger](Docs/Logger.png)
 
+Under _SimpleAI/AIAgent Log_.
+
 ## Environment Query System
 ![Query](Docs/Query.png)
 
+To test a query create a test agent under _SimpleAI/Create EQS Test Agent_ and set its Query attribute.
+
+This is how you query for a position in code:
 ```cs
 public class MoveAndFireAction : Action<ActorAIContext> {
     public QueryRunMode RunMode = QueryRunMode.Best;
