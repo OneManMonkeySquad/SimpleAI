@@ -114,7 +114,11 @@ namespace SimpleAI {
 
                 EditorGUILayout.BeginVertical();
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
-                GUILayout.Label(logLines.ToString(), textStyle);
+                var text = logLines.ToString();
+                if (text.Length == 0) {
+                    text = "<set AIDebugger.CurrentDebugTarget at runtime>";
+                }
+                GUILayout.Label(text, textStyle);
                 EditorGUILayout.EndScrollView();
                 EditorGUILayout.EndVertical();
             }
