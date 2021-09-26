@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SimpleAI {
 #if UNITY_EDITOR
@@ -11,9 +12,7 @@ namespace SimpleAI {
         public static IAIListener Active;
 
         public static void LogLine(IContext ctx, string text) {
-            if (ctx != CurrentDebugTarget || Active == null)
-                return;
-
+            Assert.IsTrue(ctx == CurrentDebugTarget && Active != null);
             Active.LogLine(text);
         }
     }

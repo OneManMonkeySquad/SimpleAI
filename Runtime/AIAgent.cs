@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -42,31 +43,34 @@ namespace SimpleAI {
                     nextActionPair = (Intelligence.DefaultAction, null);
                 }
 
-                SwitchToAction(nextActionPair, ctx);
+                SwitchToAction(ctx, nextActionPair);
             } else if (Time.time >= nextReevaluationTime) {
                 ForceEvaluation(ctx);
             }
         }
 
+        /// <summary>
         /// Force the agent to reevaluate possible actions now (ignoring the tick rate).
         /// This can be used in case the context contains significant new information
         /// and needs to be evaluated right now (new enemy, got shot, heard something, ...).
+        /// </summary>
         public void ForceEvaluation(T ctx) {
             if (CurrentAction == null || ctx.CoroutineTarget == null)
                 return; // Next Action will be chosen next Tick anyway
 
             nextReevaluationTime = Time.time + evaluationTickRate;
 
-            var setWeight = currentActionSet != null ? currentActionSet.finalWeight : 1;
+            var setWeight = currentActionSet?.finalWeight ?? 1;
             var scoreThreshold = CurrentAction.Score(ctx) * setWeight * 1.3f; // 30% higher than our current score
             var betterActionPair = Intelligence.SelectAction(ctx, scoreThreshold);
             if (betterActionPair.Item1 == null || betterActionPair.Item1 == CurrentAction) {
 #if UNITY_EDITOR
-                AIDebugger.LogLine(ctx, $"<b><i>{CurrentAction.name}</i></b>");
+                if (AIDebugger.CurrentDebugTarget == ctx && AIDebugger.Active != null)
+                    AIDebugger.LogLine(ctx, $"<b><i>{CurrentAction.name}</i></b>");
 #endif
                 return;
             }
-            SwitchToAction(betterActionPair, ctx);
+            SwitchToAction(ctx, betterActionPair);
         }
 
         /// Stop any running Action.
@@ -125,9 +129,10 @@ namespace SimpleAI {
             return bestSmartObject;
         }
 
-        void SwitchToAction((ActionBase, ActionSet) actionPair, T ctx) {
+        void SwitchToAction(T ctx, (ActionBase, ActionSet) actionPair) {
 #if UNITY_EDITOR
-            AIDebugger.LogLine(ctx, $"<b>{CurrentAction?.name} -> {actionPair.Item1.name}</b>");
+            if (AIDebugger.CurrentDebugTarget == ctx && AIDebugger.Active != null)
+                AIDebugger.LogLine(ctx, $"<b>{CurrentAction?.name} -> {actionPair.Item1.name}</b>");
 #endif
 
             Reset(ctx);

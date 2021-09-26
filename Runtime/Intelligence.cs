@@ -10,7 +10,9 @@ namespace SimpleAI {
         static List<(float, ActionBase, ActionSet)> temp = new List<(float, ActionBase, ActionSet)>();
         public (ActionBase, ActionSet) SelectAction(IContext ctx, float minScore) {
 #if UNITY_EDITOR
-            AIDebugger.LogLine(ctx, "");
+            var writeDebug = AIDebugger.CurrentDebugTarget == ctx && AIDebugger.Active != null;
+            if (writeDebug)
+                AIDebugger.LogLine(ctx, "");
 #endif
 
             temp.Clear();
@@ -20,7 +22,8 @@ namespace SimpleAI {
                     foreach (var check in actionSet.Checks) {
                         if (!check.Evaluate(ctx)) {
 #if UNITY_EDITOR
-                            AIDebugger.LogLine(ctx, $"<color=grey><i>[{actionSet.name}]</i> failed <i>{check}</i></color>");
+                            if (writeDebug)
+                                AIDebugger.LogLine(ctx, $"<color=grey><i>[{actionSet.name}]</i> failed <i>{check}</i></color>");
 #endif
                             checksFailed = true;
                             break;
@@ -37,13 +40,15 @@ namespace SimpleAI {
 
                     if (score < minScore) {
 #if UNITY_EDITOR
-                        AIDebugger.LogLine(ctx, $"<i>{action.name}</i> {score:0.00} < {minScore:0.00}");
+                        if (writeDebug)
+                            AIDebugger.LogLine(ctx, $"<i>{action.name}</i> {score:0.00} < {minScore:0.00}");
 #endif
                         continue;
                     }
                     if (!action.CheckProceduralPreconditions(ctx)) {
 #if UNITY_EDITOR
-                        AIDebugger.LogLine(ctx, $"<color=grey><i>{action.name}</i> precondition</color>");
+                        if (writeDebug)
+                            AIDebugger.LogLine(ctx, $"<color=grey><i>{action.name}</i> precondition</color>");
 #endif
                         continue;
                     }
@@ -68,11 +73,13 @@ namespace SimpleAI {
             var finalIdx = idx > 1 ? Random.Range(0, idx) : 0;
 
 #if UNITY_EDITOR
-            for (int i = 0; i < idx; ++i) {
-                AIDebugger.LogLine(ctx, $"<i>{temp[i].Item2.name}</i> {temp[i].Item1:0.00}");
-            }
-            for (int i = idx; i < temp.Count; ++i) {
-                AIDebugger.LogLine(ctx, $"<color=grey><i>{temp[i].Item2.name}</i></color> {temp[i].Item1:0.00}");
+            if (writeDebug) {
+                for (int i = 0; i < idx; ++i) {
+                    AIDebugger.LogLine(ctx, $"<i>{temp[i].Item2.name}</i> {temp[i].Item1:0.00}");
+                }
+                for (int i = idx; i < temp.Count; ++i) {
+                    AIDebugger.LogLine(ctx, $"<color=grey><i>{temp[i].Item2.name}</i></color> {temp[i].Item1:0.00}");
+                }
             }
 #endif
 
