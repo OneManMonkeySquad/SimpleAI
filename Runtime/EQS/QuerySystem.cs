@@ -15,9 +15,12 @@ namespace SimpleAI.EQS {
         static QuerySystem instance;
         public static QuerySystem Instance {
             get {
-                if (instance == null)
-                    throw new Exception("No QuerySystem instance found");
-
+                if (instance == null) {
+                    var goOuter = new GameObject("QuerySystem") {
+                        hideFlags = HideFlags.HideAndDontSave
+                    };
+                    instance = goOuter.AddComponent<QuerySystem>();
+                }
                 return instance;
             }
             internal set {
