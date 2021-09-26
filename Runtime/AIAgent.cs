@@ -86,7 +86,7 @@ namespace SimpleAI {
         }
 
         /// Select the best (and possible) SmartObject from a list of SmartObjects.
-        public SmartObjectBase SelectSmartObject(T ctx, List<SmartObjectBase> smartObjects) {
+        public SmartObjectBase SelectSmartObject(T ctx, IEnumerable<SmartObjectBase> smartObjects) {
             Assert.IsNotNull(ctx);
             Assert.IsNotNull(smartObjects);
             if (ctx == null || smartObjects == null)
