@@ -21,6 +21,8 @@ namespace SimpleAI.EQS {
 
         public float RuntimeCost => 20;
 
+        public bool AllowPartialPaths = false;
+
         NavMeshPath path;
 
         public float Run(ref Item item, QueryRunContext ctx) {
@@ -36,6 +38,9 @@ namespace SimpleAI.EQS {
             foreach (var to in tos) {
                 path.ClearCorners();
                 if (!NavMesh.CalculatePath(from, to, WalkableMask, path))
+                    return 0;
+
+                if (!AllowPartialPaths && path.status == NavMeshPathStatus.PathPartial)
                     return 0;
 
                 var distance = GetPathLength(path);
