@@ -9,7 +9,9 @@ using UnityEngine.Assertions;
 namespace SimpleAI.EQS {
     public enum QueryContext {
         Querier,
-        Target
+        Target,
+        Group1,
+        Group2
     }
 
     public struct Item {
@@ -34,15 +36,31 @@ namespace SimpleAI.EQS {
     }
 
     public struct QueryRunContext {
-        public Vector3[] Querier;
-        public Vector3[] Target;
+        public Vector3 Querier;
+        public Vector3 Target;
+        public Vector3[] Group1;
+        public Vector3[] Group2;
 
-        public Vector3[] Resolve(QueryContext ctx)
-            => ctx switch {
-                QueryContext.Querier => Querier,
-                QueryContext.Target => Target,
-                _ => throw new Exception("case missing")
-            };
+        public IEnumerable<Vector3> Resolve(QueryContext ctx) {
+            if (ctx == QueryContext.Querier) {
+                yield return Querier;
+            } else if (ctx == QueryContext.Target) {
+                yield return Target;
+            } else if (ctx == QueryContext.Group1) {
+                if (Group1 == null)
+                    yield break;
+
+                foreach (var entry in Group1)
+                    yield return entry;
+            } else if (ctx == QueryContext.Group2) {
+                if (Group2 == null)
+                    yield break;
+
+                foreach (var entry in Group2)
+                    yield return entry;
+            } else
+                throw new Exception("case missing");
+        }
     }
 
     public delegate void QueryExecuteDone(Item item);

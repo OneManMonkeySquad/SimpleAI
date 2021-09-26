@@ -7,7 +7,7 @@ namespace SimpleAI.EQS {
     [AddComponentMenu("AI/EQSQueryTestAgent")]
     public class QueryTestAgent : MonoBehaviour {
         public Query Query;
-        public Transform[] Targets;
+        public Transform Target;
 
         [MenuItem("Tools/SimpleAI/Create EQS Query Test Agent")]
         static void CreateAgent() {
@@ -20,7 +20,7 @@ namespace SimpleAI.EQS {
             target.transform.position = pos;
 
             var qta = go.AddComponent<QueryTestAgent>();
-            qta.Targets = new Transform[] { target.transform };
+            qta.Target = target.transform;
 
             Selection.activeGameObject = go;
         }
@@ -30,17 +30,14 @@ namespace SimpleAI.EQS {
                 return;
 
             var ctx = new QueryRunContext() {
-                Querier = new Vector3[] { transform.position },
-                Target = Targets.Select(t => t.position).ToArray()
+                Querier = transform.position,
+                Target = Target.position
             };
 
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(transform.position, 0.3f);
             Gizmos.color = Color.red;
-            foreach (var target in Targets) {
-
-                Gizmos.DrawWireSphere(target.position, 0.3f);
-            }
+            Gizmos.DrawWireSphere(Target.position, 0.3f);
 
             Query.Execute(QueryRunMode.All, ctx, item => {
                 Color c = Color.blue;
