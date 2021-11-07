@@ -35,11 +35,15 @@ namespace SimpleAI {
         public abstract void StopAction(IContext ctx);
 
         void OnValidate() {
-            foreach (var check in Checks) {
-                Assert.IsNotNull(check);
+            if (Checks != null) {
+                foreach (var check in Checks) {
+                    Assert.IsNotNull(check);
+                }
             }
-            foreach (var consideration in Considerations) {
-                Assert.IsNotNull(consideration);
+            if (Considerations != null) {
+                foreach (var consideration in Considerations) {
+                    Assert.IsNotNull(consideration);
+                }
             }
         }
     }
