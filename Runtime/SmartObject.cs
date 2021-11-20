@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -37,12 +38,16 @@ namespace SimpleAI {
         void OnValidate() {
             if (Checks != null) {
                 foreach (var check in Checks) {
-                    Assert.IsNotNull(check);
+                    if (check == null) {
+                        Debug.LogError("null", this);
+                    }
                 }
             }
             if (Considerations != null) {
                 foreach (var consideration in Considerations) {
-                    Assert.IsNotNull(consideration);
+                    if (consideration == null) {
+                        Debug.LogError("null", this);
+                    }
                 }
             }
         }
