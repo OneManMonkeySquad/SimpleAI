@@ -27,7 +27,7 @@ namespace SimpleAI {
     }
 
     /// Used to resolve the context type in the Consideration inspector.
-    /// You don't need to use this.
+    /// This is not the interface you are looking for.
     public interface IBoundToContextType<T> where T : IContext, new() {
     }
 }

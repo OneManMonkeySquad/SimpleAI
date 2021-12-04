@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SimpleAI {
     [CreateAssetMenu(menuName = "AI/Intelligence")]
     public class Intelligence : ScriptableObject {
         public ActionSet[] actionSets;
-        public ActionBase DefaultAction;
 
         static List<(float, ActionBase, ActionSet)> temp = new List<(float, ActionBase, ActionSet)>();
         public (ActionBase, ActionSet) SelectAction(IContext ctx, float minScore) {
@@ -70,7 +70,7 @@ namespace SimpleAI {
                     break;
             }
 
-            var finalIdx = idx > 1 ? Random.Range(0, idx) : 0;
+            var finalIdx = idx > 1 ? UnityEngine.Random.Range(0, idx) : 0;
 
 #if UNITY_EDITOR
             if (writeDebug) {
@@ -84,6 +84,14 @@ namespace SimpleAI {
 #endif
 
             return (temp[finalIdx].Item2, temp[finalIdx].Item3);
+        }
+
+        void OnValidate() {
+            // Sort ActionSets by estimated weight
+            var sortedActionSets = actionSets.OrderByDescending(actionSet => (int)(actionSet.finalWeight));
+            if (!Enumerable.SequenceEqual(sortedActionSets, actionSets)) {
+                actionSets = sortedActionSets.ToArray();
+            }
         }
     }
 }

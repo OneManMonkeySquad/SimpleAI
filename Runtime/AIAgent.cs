@@ -36,12 +36,8 @@ namespace SimpleAI {
                 nextReevaluationTime = Time.time + evaluationTickRate;
 
                 var nextActionPair = Intelligence.SelectAction(ctx, 0);
-                if (nextActionPair.Item1 == null) {
-                    if (Intelligence.DefaultAction == null)
-                        return;
-
-                    nextActionPair = (Intelligence.DefaultAction, null);
-                }
+                if (nextActionPair.Item1 == null)
+                    return;
 
                 SwitchToAction(ctx, nextActionPair);
             } else if (Time.time >= nextReevaluationTime) {

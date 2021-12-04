@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SimpleAI {
     public abstract class SmartObjectBase : MonoBehaviour {
@@ -35,6 +33,7 @@ namespace SimpleAI {
         public abstract IEnumerator StartAction(IContext ctx);
         public abstract void StopAction(IContext ctx);
 
+#if UNITY_EDITOR
         void OnValidate() {
             if (Checks != null) {
                 foreach (var check in Checks) {
@@ -51,6 +50,7 @@ namespace SimpleAI {
                 }
             }
         }
+#endif
     }
 
     public abstract class SmartObject<T> : SmartObjectBase, IBoundToContextType<T> where T : IContext, new() {
