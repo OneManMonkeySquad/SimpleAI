@@ -8,7 +8,7 @@ namespace SimpleAI.EQS {
 
         public float RuntimeCost => 4;
 
-        public float Run(ref Item item, QueryRunContext ctx) {
+        public float Run(ref Item item, ResolvedQueryRunContext ctx) {
             var isValid = NavMesh.SamplePosition(item.Point, out NavMeshHit hit, MaxDistance, NavMesh.AllAreas);
             if (!isValid)
                 return 0;

@@ -9,6 +9,6 @@ namespace SimpleAI.EQS {
         /// <summary>
         /// Run the test and return a score between [0,1] with 1 being the best score.
         /// </summary>
-        float Run(ref Item item, QueryRunContext ctx);
+        float Run(ref Item item, ResolvedQueryRunContext ctx);
     }
 }

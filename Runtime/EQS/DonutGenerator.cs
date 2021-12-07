@@ -16,7 +16,7 @@ namespace SimpleAI.EQS {
         [Range(15, 90)]
         public float AngleIncrements = 30;
 
-        public int GenerateItemsNonAlloc(QueryContext around, QueryRunContext ctx, Item[] items) {
+        public int GenerateItemsNonAlloc(QueryContext around, ResolvedQueryRunContext ctx, Item[] items) {
             int num = 0;
 
             var centers = ctx.Resolve(around);

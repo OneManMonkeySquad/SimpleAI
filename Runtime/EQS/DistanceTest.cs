@@ -17,7 +17,7 @@ namespace SimpleAI.EQS {
 
         public float RuntimeCost => 1;
 
-        public float Run(ref Item item, QueryRunContext ctx) {
+        public float Run(ref Item item, ResolvedQueryRunContext ctx) {
             var from = item.Point;
             var tos = ctx.Resolve(To);
 

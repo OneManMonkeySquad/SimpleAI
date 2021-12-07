@@ -41,25 +41,35 @@ namespace SimpleAI.EQS {
         public Vector3[] Group1;
         public Vector3[] Group2;
 
-        public IEnumerable<Vector3> Resolve(QueryContext ctx) {
-            if (ctx == QueryContext.Querier) {
-                yield return Querier;
-            } else if (ctx == QueryContext.Target) {
-                yield return Target;
-            } else if (ctx == QueryContext.Group1) {
-                if (Group1 == null)
-                    yield break;
+        public ResolvedQueryRunContext Resolve() {
+            return new ResolvedQueryRunContext() {
+                Querier = new Vector3[] { Querier },
+                Target = new Vector3[] { Target },
+                Group1 = Group1,
+                Group2 = Group2
+            };
+        }
+    }
 
-                foreach (var entry in Group1)
-                    yield return entry;
-            } else if (ctx == QueryContext.Group2) {
-                if (Group2 == null)
-                    yield break;
+    public struct ResolvedQueryRunContext {
+        public Vector3[] Querier;
+        public Vector3[] Target;
+        public Vector3[] Group1;
+        public Vector3[] Group2;
 
-                foreach (var entry in Group2)
-                    yield return entry;
-            } else
-                throw new Exception("case missing");
+        public Vector3[] Resolve(QueryContext ctx) {
+            switch (ctx) {
+                case QueryContext.Querier:
+                    return Querier;
+                case QueryContext.Target:
+                    return Target;
+                case QueryContext.Group1:
+                    return Group1;
+                case QueryContext.Group2:
+                    return Group2;
+                default:
+                    throw new Exception("case missing");
+            }
         }
     }
 

@@ -25,7 +25,7 @@ namespace SimpleAI.EQS {
 
         NavMeshPath path;
 
-        public float Run(ref Item item, QueryRunContext ctx) {
+        public float Run(ref Item item, ResolvedQueryRunContext ctx) {
             if (path == null) {
                 // Not allowed to be called in ctor
                 path = new NavMeshPath();

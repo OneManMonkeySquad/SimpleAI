@@ -28,7 +28,7 @@ namespace SimpleAI.EQS {
 
         public float RuntimeCost => 10;
 
-        public float Run(ref Item item, QueryRunContext ctx) {
+        public float Run(ref Item item, ResolvedQueryRunContext ctx) {
             var fromWithOffset = item.Point + Offset;
             var tos = ctx.Resolve(To);
 

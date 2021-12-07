@@ -40,14 +40,16 @@ namespace SimpleAI.EQS {
             if (query.Generator == null)
                 return;
 
-            var num = query.Generator.GenerateItemsNonAlloc(query.Around, ctx, items);
+            var rctx = ctx.Resolve();
+
+            var num = query.Generator.GenerateItemsNonAlloc(query.Around, rctx, items);
             for (var i = 0; i < num; ++i) {
                 var totalScore = 1f;
                 foreach (var test in query.Tests) {
                     if (test == null)
                         continue;
 
-                    var score = test.Run(ref items[i], ctx);
+                    var score = test.Run(ref items[i], rctx);
                     Assert.IsTrue(score >= 0f && score <= 1f);
                     totalScore *= score;
                     if (totalScore < 0.01f)

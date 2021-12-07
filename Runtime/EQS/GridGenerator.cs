@@ -10,7 +10,7 @@ namespace SimpleAI.EQS {
         [Range(0.1f, 10f)]
         public float Padding = 1;
 
-        public int GenerateItemsNonAlloc(QueryContext around, QueryRunContext ctx, Item[] items) {
+        public int GenerateItemsNonAlloc(QueryContext around, ResolvedQueryRunContext ctx, Item[] items) {
             int num = 0;
 
             var centers = ctx.Resolve(around);
