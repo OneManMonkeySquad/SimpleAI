@@ -1,20 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace SimpleAI {
     public class AIAgent<T> where T : class, IContext {
-        public ActionBase CurrentAction {
-            get;
-            internal set;
-        }
-
-        public Intelligence Intelligence {
-            get;
-            internal set;
-        }
+        public ActionBase CurrentAction { get; private set; }
+        public Intelligence Intelligence { get; private set; }
 
         ActionSet currentActionSet;
         Coroutine currentActionCoroutine;
@@ -69,7 +61,7 @@ namespace SimpleAI {
             SwitchToAction(ctx, betterActionPair);
         }
 
-        /// Stop any running Action.
+        /// Stop any running Action. This is usually done before destroying the controlled GameObject.
         public void Reset(T ctx) {
             if (currentActionCoroutine != null) {
                 ctx.CoroutineTarget.StopCoroutine(currentActionCoroutine);

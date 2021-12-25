@@ -22,12 +22,14 @@ namespace SimpleAI {
         MonoBehaviour CoroutineTarget { get; }
 
         float GetCurrentConsiderationScore(int considerationIdx);
+#if UNITY_EDITOR
         /// Used by the inspector to display possible considerations.
         string[] GetConsiderationDescriptions();
+#endif
     }
 
     /// Used to resolve the context type in the Consideration inspector.
     /// This is not the interface you are looking for.
-    public interface IBoundToContextType<T> where T : IContext, new() {
+    public interface IBoundToContextType<T> where T : IContext {
     }
 }

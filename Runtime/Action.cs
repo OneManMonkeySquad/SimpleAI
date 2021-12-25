@@ -43,7 +43,7 @@ namespace SimpleAI {
         public virtual string ToString(IContext ctx) => name;
     }
 
-    public abstract class Action<T> : ActionBase, IBoundToContextType<T> where T : IContext, new() {
+    public abstract class Action<T> : ActionBase, IBoundToContextType<T> where T : IContext {
         public virtual bool CheckProceduralPreconditions(T ctx) => true;
 
         public abstract IEnumerator StartAction(T ctx);
