@@ -115,7 +115,7 @@ namespace SimpleAI {
                 EditorGUILayout.BeginVertical();
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
                 var text = logLines.ToString();
-                if (text.Length == 0) {
+                if (text.Length == 0 && AIDebugger.CurrentDebugTarget == null) {
                     text = "<set AIDebugger.CurrentDebugTarget at runtime>";
                 }
                 GUILayout.Label(text, textStyle);

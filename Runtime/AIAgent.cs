@@ -19,7 +19,9 @@ namespace SimpleAI {
             this.evaluationTickRate = evaluationTickRate;
         }
 
+        /// <summary>
         /// Call this every frame. Might switch to a new action.
+        /// </summary>
         public void Tick(T ctx) {
             if (CurrentAction == null) {
                 if (Time.time < nextReevaluationTime)
