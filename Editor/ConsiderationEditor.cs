@@ -33,7 +33,15 @@ namespace SimpleAI {
                 if (t != typeof(System.Object)) {
                     var boundToCtx = t.GetInterfaces().First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IBoundToContextType<>));
                     var ctxType = boundToCtx.GetGenericArguments()[0];
-                    var ctxTempInstance = (IContext)Activator.CreateInstance(ctxType);
+
+                    // Create user-supplied context instance in order 
+                    IContext ctxTempInstance;
+                    try {
+                        ctxTempInstance = (IContext)Activator.CreateInstance(ctxType);
+                    } catch (MissingMethodException) {
+                        Debug.LogError("Your AI context must be default constructible (constructor without any required arguments)");
+                        return;
+                    }
 
                     var descs = ctxTempInstance.GetConsiderationDescriptions();
                     var indices = Enumerable.Range(0, descs.Length + 1).ToArray();
