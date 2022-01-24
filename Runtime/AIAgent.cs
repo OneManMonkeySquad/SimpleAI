@@ -64,7 +64,7 @@ namespace SimpleAI {
         }
 
         /// Stop any running Action. This is usually done before destroying the controlled GameObject.
-        public void Reset(T ctx) {
+        public void Stop(T ctx) {
             if (currentActionCoroutine != null) {
                 ctx.CoroutineTarget.StopCoroutine(currentActionCoroutine);
                 currentActionCoroutine = null;
@@ -125,7 +125,7 @@ namespace SimpleAI {
                 AIDebugger.LogLine(ctx, $"<b>{CurrentAction?.name} -> {actionPair.Item1.name}</b>");
 #endif
 
-            Reset(ctx);
+            Stop(ctx);
 
             if (actionPair.Item1 == null)
                 return;
