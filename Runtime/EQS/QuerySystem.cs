@@ -82,7 +82,7 @@ namespace SimpleAI.EQS {
                             }
                         }
 
-                        var threshold = Mathf.Max(bestScore - 0.25f, 0);
+                        var threshold = Mathf.Max(bestScore * 0.75f, 0);
 
                         tempListItems.Clear();
                         for (int i = 0; i < num; ++i) {
