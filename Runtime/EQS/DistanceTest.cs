@@ -20,6 +20,8 @@ namespace SimpleAI.EQS {
         public float Run(ref Item item, ResolvedQueryRunContext ctx) {
             var from = item.Point;
             var tos = ctx.Resolve(To);
+            if (tos == null)
+                return 1; // #todo Sure?
 
             var c = 1f;
             foreach (var to in tos) {
