@@ -6,29 +6,24 @@ namespace SimpleAI.Perception {
     public class AIPerception : MonoBehaviour {
         public AIPerceptionSettings Settings;
 
-        public IEnumerable<ISenseListener> Listeners => listeners;
+        public IEnumerable<ISenseListener> Listeners => _listeners;
         public Transform View;
 
-        List<ISenseListener> listeners = new List<ISenseListener>();
+        List<ISenseListener> _listeners = new List<ISenseListener>();
 
         float _nextUpdateTime;
 
-        public void AddListener(ISenseListener listener) {
-            listeners.Add(listener);
-        }
-
-        public void RemoveListener(ISenseListener listener) {
-            listeners.Remove(listener);
-        }
+        public void AddListener(ISenseListener listener) => _listeners.Add(listener);
+        public void RemoveListener(ISenseListener listener) => _listeners.Remove(listener);
 
         public void UpdateSenses() {
             _nextUpdateTime = Time.time + Settings.UpdateRate * UnityEngine.Random.Range(1f, 1.2f); // Stagger updates
 
-            if (listeners.Count == 0)
+            if (_listeners.Count == 0)
                 return;
 
             foreach (var sense in Settings.Senses) {
-                sense.Update(View, listeners);
+                sense.Update(this, _listeners);
             }
         }
 
@@ -54,7 +49,7 @@ namespace SimpleAI.Perception {
 #if UNITY_EDITOR
         void OnDrawGizmosSelected() {
             foreach (var sense in Settings.Senses) {
-                sense.DebugDraw(View);
+                sense.DebugDraw(this);
             }
         }
 #endif

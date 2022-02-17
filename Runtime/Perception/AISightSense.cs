@@ -16,55 +16,59 @@ namespace SimpleAI.Perception {
 
         public Cone[] Cones;
         public LayerMask LineOfSightBlockingMask;
+        [Tooltip("At this distance anything is detected")]
+        public float AnyAngleDetectionDistance = 2;
 
-        static List<GameObject> Sources = new List<GameObject>();
-        static int sourceBuildAtFrame;
+        static List<GameObject> s_sources = new List<GameObject>();
+        static int s_sourceBuildAtFrame;
 
-        static KDTree tree = new KDTree();
-        static List<Vector3> points = new List<Vector3>();
-        static List<int> results = new List<int>();
-        static KDQuery query = new KDQuery();
-        static HashSet<GameObject> targetsReported = new HashSet<GameObject>();
+        static KDTree s_tree = new KDTree();
+        static List<Vector3> s_points = new List<Vector3>();
+        static List<int> s_results = new List<int>();
+        static KDQuery s_query = new KDQuery();
+        static HashSet<GameObject> s_targetsReported = new HashSet<GameObject>();
 
-        public static void AddSource(GameObject source) => Sources.Add(source);
-        public static void RemoveSource(GameObject source) => Sources.Remove(source);
+        public static void AddSource(GameObject source) => s_sources.Add(source);
+        public static void RemoveSource(GameObject source) => s_sources.Remove(source);
 
         public void Add(AIPerception perception) { }
         public void Remove(AIPerception perception) { }
 
-        public void Update(Transform view, IEnumerable<ISenseListener> listeners) {
-            Assert.IsNotNull(view);
+        public void Update(AIPerception perception, IEnumerable<ISenseListener> listeners) {
+            Assert.IsNotNull(perception);
 
             if (Cones.Length == 0)
                 return;
 
-            if (sourceBuildAtFrame != Time.frameCount) {
-                sourceBuildAtFrame = Time.frameCount;
+            if (s_sourceBuildAtFrame != Time.frameCount) {
+                s_sourceBuildAtFrame = Time.frameCount;
 
-                points.Clear();
-                for (int i = 0; i < Sources.Count; ++i) {
-                    points.Add(Sources[i].transform.position);
+                s_points.Clear();
+                for (int i = 0; i < s_sources.Count; ++i) {
+                    s_points.Add(s_sources[i].transform.position);
                 }
-                tree.Build(points);
+                s_tree.Build(s_points);
             }
 
-            float maxDistance = 0;
+            float maxDistance = AnyAngleDetectionDistance;
             for (int coneIdx = 0; coneIdx < Cones.Length; ++coneIdx) {
                 var cone = Cones[coneIdx];
                 maxDistance = Mathf.Max(maxDistance, cone.MaxDistance);
             }
 
-            results.Clear();
-            query.Radius(tree, view.position, maxDistance, results);
+            var view = perception.View;
 
-            targetsReported.Clear();
+            s_results.Clear();
+            s_query.Radius(s_tree, view.position, maxDistance, s_results);
+
+            s_targetsReported.Clear();
             for (int coneIdx = 0; coneIdx < Cones.Length; ++coneIdx) {
                 var cone = Cones[coneIdx];
                 var sqrConeMaxDistance = cone.MaxDistance * cone.MaxDistance;
 
-                for (int i = 0; i < results.Count; ++i) {
-                    var sourceIdx = results[i];
-                    var target = Sources[sourceIdx];
+                for (int i = 0; i < s_results.Count; ++i) {
+                    var sourceIdx = s_results[i];
+                    var target = s_sources[sourceIdx];
 
                     var diffToTarget = target.transform.position - view.position;
 
@@ -72,7 +76,7 @@ namespace SimpleAI.Perception {
                     if (sqrDistanceToTarget > sqrConeMaxDistance)
                         continue;
 
-                    if (sqrDistanceToTarget > 1.5f) { // Detect everything at close distance
+                    if (sqrDistanceToTarget > AnyAngleDetectionDistance) {
                         var angle = Vector3.Angle(view.forward, diffToTarget.normalized);
                         if (angle > cone.Angle / 2)
                             continue;
@@ -81,37 +85,14 @@ namespace SimpleAI.Perception {
                             continue;
                     }
 
-                    // Make sure we report everything only once
-                    if (targetsReported.Contains(target))
+                    if (!CheckTarget(target, perception, sqrDistanceToTarget, maxDistance))
                         continue;
 
-                    targetsReported.Add(target);
+                    // Make sure we report everything only once
+                    if (s_targetsReported.Contains(target))
+                        continue;
 
-                    // Respect CharacterStats
-                    /* #todo
-                    var targetHumanoid = target.GetComponent<Humanoid>();
-                    if (targetHumanoid != null) {
-                        if (targetHumanoid == character)
-                            continue;
-
-#if UNITY_EDITOR
-                        if (targetHumanoid.isServer != character.isServer)
-                            continue;
-#endif
-
-                        var effectiveSightDistance = maxDistance;
-                        targetHumanoid.Stats.ModifyStat(CharacterStat.PerceptionSighted, ref effectiveSightDistance);
-                        if (distanceToTarget > effectiveSightDistance)
-                            continue;
-
-                        // #todo giant fucking hack.. should maybe be a Debuff
-                        if (targetHumanoid.LastStealingTime >= Time.time - 1) {
-                            foreach (var listener in listeners) {
-                                listener.OnStealingSensed(targetHumanoid);
-                            }
-                        }
-                    }
-                    */
+                    s_targetsReported.Add(target);
 
                     // Report
                     foreach (var listener in listeners) {
@@ -121,13 +102,13 @@ namespace SimpleAI.Perception {
             }
         }
 
-#if UNITY_EDITOR
-        public void DebugDraw(Transform view) {
-            return; //#todo
-            //if (!Globals.Instance.DebugPerception)
-            //    return;
+        protected virtual bool CheckTarget(GameObject target, AIPerception perception, float sqrDistanceToTarget, float maxDistance) => true;
 
-            Assert.IsNotNull(view);
+#if UNITY_EDITOR
+        public void DebugDraw(AIPerception perception) {
+            Assert.IsNotNull(perception);
+
+            var view = perception.View;
 
             for (int coneIdx = 0; coneIdx < Cones.Length; ++coneIdx) {
                 var cone = Cones[coneIdx];
@@ -146,7 +127,7 @@ namespace SimpleAI.Perception {
             }
 
             var drawer = new SenseDebugDrawer(view);
-            Update(view, new[] { drawer });
+            Update(perception, new[] { drawer });
         }
 #endif
     }

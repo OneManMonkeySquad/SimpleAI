@@ -4,10 +4,10 @@ using UnityEngine;
 namespace SimpleAI.Perception {
     public interface ISense {
         void Add(AIPerception perception);
-        void Update(Transform view, IEnumerable<ISenseListener> listeners);
+        void Update(AIPerception perception, IEnumerable<ISenseListener> listeners);
         void Remove(AIPerception perception);
 #if UNITY_EDITOR
-        void DebugDraw(Transform view);
+        void DebugDraw(AIPerception perception);
 #endif
     }
 

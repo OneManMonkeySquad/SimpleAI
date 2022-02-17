@@ -85,10 +85,8 @@ namespace SimpleAI.Perception {
             }
         }
 
-        public void Update(Transform view, IEnumerable<ISenseListener> listeners) {
-        }
+        public void Update(AIPerception perception, IEnumerable<ISenseListener> listeners) { }
 
-        public void DebugDraw(Transform view) {
-        }
+        public void DebugDraw(AIPerception perception) { }
     }
 }
