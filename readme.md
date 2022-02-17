@@ -1,5 +1,7 @@
 # SimpleAI
-Coroutine-based utility AI for [Unity3d](https://unity3d.com). Includes an Unreal inspired EQS system.
+Coroutine-based utility AI for [Unity3d](https://unity3d.com). Includes an Unreal inspired perception and environment query system.
+
+This repo is relatively stable and production ready.
 
 ## Overview
 This library is a framework for AI and does not contain any behaviour. The API surface is minimal and you should be up and running in no time.
