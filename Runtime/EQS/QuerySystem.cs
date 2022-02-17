@@ -4,6 +4,10 @@ using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace SimpleAI.EQS {
+    public interface IEQSLogger {
+        void Foo(Query query, Span<Item> items, int? bestIdx);
+    }
+
     public class QuerySystem : MonoBehaviour {
         public struct Job {
             public Query Query;
@@ -12,51 +16,53 @@ namespace SimpleAI.EQS {
             public QueryExecuteDone Done;
         }
 
-        static QuerySystem instance;
+        static QuerySystem s_instance;
         public static QuerySystem Instance {
             get {
-                if (instance == null) {
+                if (s_instance == null) {
                     var goOuter = new GameObject("QuerySystem") {
                         hideFlags = HideFlags.HideAndDontSave
                     };
-                    instance = goOuter.AddComponent<QuerySystem>();
+                    s_instance = goOuter.AddComponent<QuerySystem>();
                 }
-                return instance;
+                return s_instance;
             }
             internal set {
-                instance = value;
+                s_instance = value;
             }
         }
 
-        Queue<Job> jobs = new Queue<Job>();
-        Item[] items = new Item[64];
+        public static IEQSLogger ActiveLogger;
 
-        public void AddQuery(Job job) {
-            jobs.Enqueue(job);
+        Queue<Job> _jobs = new Queue<Job>();
+
+        public void QueueJob(Job job) {
+            _jobs.Enqueue(job);
         }
 
-        List<Item> tempListItems = new List<Item>();
+        Item[] _items = new Item[64];
+        List<Item> _tempListItems = new List<Item>();
         public void Execute(Query query, QueryRunMode mode, QueryRunContext ctx, QueryExecuteDone done) {
             if (query.Generator == null)
                 return;
 
             var resolvedCtx = ctx.Resolve();
 
-            var num = query.Generator.GenerateItemsNonAlloc(query.Around, resolvedCtx, items);
+            var num = query.Generator.GenerateItemsNonAlloc(query.Around, resolvedCtx, _items);
             for (var i = 0; i < num; ++i) {
                 var totalScore = 1f;
                 foreach (var test in query.Tests) {
                     if (test == null)
                         continue;
 
-                    var score = test.Run(ref items[i], resolvedCtx);
+                    var score = test.Run(ref _items[i], resolvedCtx);
                     Assert.IsTrue(score >= 0f && score <= 1f);
                     totalScore *= score;
                     if (totalScore < 0.01f)
                         break;
                 }
 
-                items[i].Score = totalScore;
+                _items[i].Score = totalScore;
             }
 
             switch (mode) {
@@ -64,19 +70,21 @@ namespace SimpleAI.EQS {
                         var bestScore = 0f;
                         var bestIdx = 0;
                         for (int i = 0; i < num; ++i) {
-                            var item = items[i];
+                            var item = _items[i];
                             if (item.Score > bestScore) {
                                 bestScore = item.Score;
                                 bestIdx = i;
                             }
                         }
-                        done(items[bestIdx]);
+                        var best = _items[bestIdx];
+                        ActiveLogger?.Foo(query, new Span<Item>(_items, 0, num), bestIdx);
+                        done(best);
                         break;
                     }
                 case QueryRunMode.RandomBest25Pct: {
                         var bestScore = 0f;
                         for (int i = 0; i < num; ++i) {
-                            var item = items[i];
+                            var item = _items[i];
                             if (item.Score > bestScore) {
                                 bestScore = item.Score;
                             }
@@ -84,22 +92,26 @@ namespace SimpleAI.EQS {
 
                         var threshold = Mathf.Max(bestScore * 0.75f, 0);
 
-                        tempListItems.Clear();
+                        _tempListItems.Clear();
                         for (int i = 0; i < num; ++i) {
-                            var item = items[i];
+                            var item = _items[i];
                             if (item.Score >= threshold) {
-                                tempListItems.Add(item);
+                                _tempListItems.Add(item);
                             }
                         }
 
-                        done(tempListItems[UnityEngine.Random.Range(0, tempListItems.Count)]);
+                        var bestIdx = UnityEngine.Random.Range(0, _tempListItems.Count);
+                        var best = _tempListItems[bestIdx];
+                        ActiveLogger?.Foo(query, new Span<Item>(_items, 0, num), bestIdx);
+                        done(best);
                         break;
                     }
                 case QueryRunMode.All: {
                         for (int i = 0; i < num; ++i) {
-                            var item = items[i];
+                            var item = _items[i];
                             done(item);
                         }
+                        ActiveLogger?.Foo(query, new Span<Item>(_items, 0, num), null);
                         break;
                     }
                 default:
@@ -108,15 +120,15 @@ namespace SimpleAI.EQS {
         }
 
         void Awake() {
-            instance = this;
+            s_instance = this;
         }
 
         void Update() {
-            if (jobs.Count == 0)
+            if (_jobs.Count == 0)
                 return;
 
             // One per frame
-            var job = jobs.Dequeue();
+            var job = _jobs.Dequeue();
             Execute(job.Query, job.Mode, job.Ctx, job.Done);
         }
     }

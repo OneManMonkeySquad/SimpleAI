@@ -113,6 +113,7 @@ Under _SimpleAI/AIAgent Log_.
 ## Environment Query System
 ![Query](Docs/Query.png)
 ![QueryTest](Docs/QueryTest.png)
+![Logger](Docs/EQSLogger.png)
 
 To test a query create a test agent under _SimpleAI/Create EQS Test Agent_ and set its Query attribute.
 

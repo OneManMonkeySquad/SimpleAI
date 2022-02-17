@@ -39,21 +39,23 @@ namespace SimpleAI.EQS {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(Target.position, 0.3f);
 
-            Query.Execute(QueryRunMode.All, ctx, item => {
-                Color c = Color.blue;
+            Query.Execute(QueryRunMode.All, ctx, DebugDrawItem);
+        }
 
-                var isValidItem = item.Score >= 0.01f;
-                if (isValidItem) {
-                    c = Color.Lerp(Color.red, Color.green, item.Score);
-                }
+        public static void DebugDrawItem(Item item) {
+            Color c = Color.blue;
 
-                Gizmos.color = c;
-                Gizmos.DrawSphere(item.Point, 0.25f);
+            var isValidItem = item.Score >= 0.01f;
+            if (isValidItem) {
+                c = Color.Lerp(Color.red, Color.green, item.Score);
+            }
 
-                if (isValidItem) {
-                    Handles.Label(item.Point - Vector3.up / 3, ((int)(item.Score * 100)).ToString());
-                }
-            });
+            Handles.color = c;
+            Handles.SphereHandleCap(0, item.Point, Quaternion.identity, 0.25f, EventType.Repaint);
+
+            if (isValidItem) {
+                Handles.Label(item.Point - Vector3.up / 3, ((int)(item.Score * 100)).ToString());
+            }
         }
     }
 #endif

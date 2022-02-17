@@ -100,7 +100,7 @@ namespace SimpleAI.EQS {
                 Ctx = ctx,
                 Done = done
             };
-            QuerySystem.Instance.AddQuery(job);
+            QuerySystem.Instance.QueueJob(job);
         }
 
         public void Execute(QueryRunMode mode, QueryRunContext ctx, QueryExecuteDone done) {
