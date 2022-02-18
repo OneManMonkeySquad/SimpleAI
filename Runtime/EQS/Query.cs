@@ -38,15 +38,15 @@ namespace SimpleAI.EQS {
     public struct QueryRunContext {
         public Vector3 Querier;
         public Vector3 Target;
-        public Vector3[] Group1;
-        public Vector3[] Group2;
+        public IEnumerable<Vector3> Group1;
+        public IEnumerable<Vector3> Group2;
 
         public ResolvedQueryRunContext Resolve() {
             return new ResolvedQueryRunContext() {
                 Querier = new Vector3[] { Querier },
                 Target = new Vector3[] { Target },
-                Group1 = Group1,
-                Group2 = Group2
+                Group1 = Group1?.ToArray(),
+                Group2 = Group2?.ToArray()
             };
         }
     }

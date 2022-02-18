@@ -11,9 +11,9 @@ namespace SimpleAI.EQS {
             Furthest
         }
 
-        public enum Require {
-            Hit,
-            Miss
+        public enum ModType {
+            RequireHit,
+            RequireMiss
         }
 
         public QueryContext To;
@@ -21,7 +21,7 @@ namespace SimpleAI.EQS {
         public Vector3 Offset;
 
         [Header("Filter")]
-        public Require Mode = Require.Hit;
+        public ModType Mode = ModType.RequireHit;
 
         [Header("Score")]
         public Score ScoreMode = Score.None;
@@ -37,7 +37,7 @@ namespace SimpleAI.EQS {
                 var toWithOffset = to + Offset;
 
                 var hit = Physics.Linecast(fromWithOffset, toWithOffset, out RaycastHit hitInfo, LinecastMask);
-                if ((hit && Mode == Require.Miss) || (!hit && Mode == Require.Hit))
+                if ((hit && Mode == ModType.RequireMiss) || (!hit && Mode == ModType.RequireHit))
                     return 0;
 
                 if (ScoreMode != Score.None) {
