@@ -9,12 +9,14 @@ namespace SimpleAI.EQS {
             public Query Query;
             public Item[] Items;
             public int? BestIdx;
+            public double Time;
         }
 
         [SerializeField]
         List<Entry> _entries = new List<Entry>();
         [SerializeField]
         int _selectedIdx;
+        Vector2 _scrollPos;
 
         [MenuItem("Tools/SimpleAI/EQS Log")]
         static void Init() {
@@ -26,8 +28,10 @@ namespace SimpleAI.EQS {
             _entries.Add(new Entry() {
                 Query = query,
                 Items = items.ToArray(),
-                BestIdx = bestIdx
+                BestIdx = bestIdx,
+                Time = Time.timeAsDouble
             });
+            Repaint();
         }
 
         void OnFocus() {
@@ -58,20 +62,34 @@ namespace SimpleAI.EQS {
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
-            EditorGUILayout.BeginVertical(GUILayout.Width(200));
+            GUILayout.BeginHorizontal();
+            {
+                EditorGUILayout.BeginVertical(GUILayout.Width(200));
+                _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
 
-            var activeButtonStyle = new GUIStyle(GUI.skin.button);
-            activeButtonStyle.fontStyle = FontStyle.Bold;
+                var activeButtonStyle = new GUIStyle(GUI.skin.button);
+                activeButtonStyle.fontStyle = FontStyle.Bold;
 
-            for (int i = 0; i < _entries.Count; ++i) {
-                var e = _entries[i];
+                for (int i = 0; i < _entries.Count; ++i) {
+                    var e = _entries[i];
 
-                var style = i != _selectedIdx ? GUI.skin.button : activeButtonStyle;
-                if (GUILayout.Button(e.Query.name, style)) {
-                    _selectedIdx = i;
+                    var style = i != _selectedIdx ? GUI.skin.button : activeButtonStyle;
+                    if (GUILayout.Button(e.Query.name, style)) {
+                        _selectedIdx = i;
+                    }
                 }
+                GUILayout.EndScrollView();
+                EditorGUILayout.EndVertical();
             }
-            EditorGUILayout.EndVertical();
+            {
+                EditorGUILayout.BeginVertical();
+                if (_selectedIdx >= 0 && _selectedIdx < _entries.Count) {
+                    var e = _entries[_selectedIdx];
+                    EditorGUILayout.LabelField($"Time: {e.Time:0.00}");
+                }
+                EditorGUILayout.EndVertical();
+            }
+            GUILayout.EndHorizontal();
         }
     }
 }
