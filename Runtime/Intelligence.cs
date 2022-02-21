@@ -7,7 +7,7 @@ namespace SimpleAI {
     public class Intelligence : ScriptableObject {
         public ActionSet[] actionSets;
 
-        static List<(float, ActionBase, ActionSet)> temp = new List<(float, ActionBase, ActionSet)>();
+        static List<(float, ActionBase, ActionSet)> s_temp = new List<(float, ActionBase, ActionSet)>();
         public (ActionBase, ActionSet) SelectAction(IContext ctx, float minScore) {
 #if UNITY_EDITOR
             var writeDebug = AIDebugger.CurrentDebugTarget == ctx && AIDebugger.Active != null;
@@ -15,7 +15,7 @@ namespace SimpleAI {
                 AIDebugger.LogLine(ctx, "");
 #endif
 
-            temp.Clear();
+            s_temp.Clear();
             foreach (var actionSet in actionSets) {
                 if (actionSet.Checks != null) {
                     var checksFailed = false;
@@ -53,20 +53,20 @@ namespace SimpleAI {
                         continue;
                     }
 
-                    temp.Add((score, action, actionSet));
+                    s_temp.Add((score, action, actionSet));
                 }
             }
 
-            if (temp.Count == 0)
+            if (s_temp.Count == 0)
                 return (null, null);
 
-            temp.Sort((lhs, rhs) => (int)(rhs.Item1 * 100) - (int)(lhs.Item1 * 100));
+            s_temp.Sort((lhs, rhs) => (int)(rhs.Item1 * 100) - (int)(lhs.Item1 * 100));
 
-            var scoreThreshold = temp[0].Item1 - 0.1f; // 10% worse than best
+            var scoreThreshold = s_temp[0].Item1 - 0.1f; // 10% worse than best
 
             int idx = 0;
-            for (; idx < temp.Count; ++idx) {
-                if (temp[idx].Item1 < scoreThreshold)
+            for (; idx < s_temp.Count; ++idx) {
+                if (s_temp[idx].Item1 < scoreThreshold)
                     break;
             }
 
@@ -75,15 +75,15 @@ namespace SimpleAI {
 #if UNITY_EDITOR
             if (writeDebug) {
                 for (int i = 0; i < idx; ++i) {
-                    AIDebugger.LogLine(ctx, $"<i>{temp[i].Item2.name}</i> {temp[i].Item1:0.00}");
+                    AIDebugger.LogLine(ctx, $"<i>{s_temp[i].Item2.name}</i> {s_temp[i].Item1:0.00}");
                 }
-                for (int i = idx; i < temp.Count; ++i) {
-                    AIDebugger.LogLine(ctx, $"<color=grey><i>{temp[i].Item2.name}</i></color> {temp[i].Item1:0.00}");
+                for (int i = idx; i < s_temp.Count; ++i) {
+                    AIDebugger.LogLine(ctx, $"<color=grey><i>{s_temp[i].Item2.name}</i></color> {s_temp[i].Item1:0.00}");
                 }
             }
 #endif
 
-            return (temp[finalIdx].Item2, temp[finalIdx].Item3);
+            return (s_temp[finalIdx].Item2, s_temp[finalIdx].Item3);
         }
 
         void OnValidate() {
