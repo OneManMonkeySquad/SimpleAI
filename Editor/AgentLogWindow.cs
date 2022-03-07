@@ -38,11 +38,11 @@ namespace SimpleAI {
             if (logLines.Length > linesToKeep) {
                 var off = 0;
                 for (; off < linesToKeep - 1; ++off) {
-                    if (logLines[off] == '\n' && logLines[off + 1] == '\n')
+                    if (logLines[off] == '\n' && logLines[off + 1] == '\n') {
+                        logLines.Remove(0, off + 1);
                         break;
+                    }
                 }
-
-                logLines.Remove(off, System.Math.Min(logLines.Length, linesToKeep - off));
             }
 
             logLines.AppendLine(text);
