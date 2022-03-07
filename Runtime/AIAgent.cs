@@ -56,7 +56,7 @@ namespace SimpleAI {
             if (betterActionPair.Item1 == null || betterActionPair.Item1 == CurrentAction) {
 #if UNITY_EDITOR
                 if (AIDebugger.CurrentDebugTarget == ctx && AIDebugger.Active != null)
-                    AIDebugger.LogLine(ctx, $"<b><i>{CurrentAction.name}</i></b>");
+                    AIDebugger.LogLine(ctx, $"<b>Keep <i>{CurrentAction.name}</i></b>");
 #endif
                 return;
             }
