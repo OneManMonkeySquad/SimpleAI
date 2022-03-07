@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SimpleAI.EQS {
     [UnityEngine.Scripting.APIUpdating.MovedFrom(false, null, "Assembly-CSharp")]
@@ -17,7 +18,8 @@ namespace SimpleAI.EQS {
         }
 
         public QueryContext To;
-        public LayerMask LinecastMask;
+        [FormerlySerializedAs("LinecastMask")]
+        public LayerMask PhysicsMask;
         public Vector3 Offset;
 
         [Header("Filter")]
@@ -36,7 +38,7 @@ namespace SimpleAI.EQS {
             foreach (var to in tos) {
                 var toWithOffset = to + Offset;
 
-                var hit = Physics.Linecast(fromWithOffset, toWithOffset, out RaycastHit hitInfo, LinecastMask);
+                var hit = Physics.Linecast(fromWithOffset, toWithOffset, out RaycastHit hitInfo, PhysicsMask);
                 if ((hit && Mode == ModType.RequireMiss) || (!hit && Mode == ModType.RequireHit))
                     return 0;
 
