@@ -7,8 +7,6 @@ using UnityEngine.Assertions;
 namespace SimpleAI.Perception {
     [Serializable]
     public class AISoundSense : ISense {
-        public LayerMask Blocking;
-
         static List<AIPerception> _receivers = new();
         static List<LayerMask> _blocking = new();
         static int _sourceBuildAtFrame;
@@ -53,11 +51,6 @@ namespace SimpleAI.Perception {
             for (int i = 0; i < _results.Count; ++i) {
                 var sourceIdx = _results[i];
                 var perception = _receivers[sourceIdx];
-                var blocking = _blocking[sourceIdx];
-
-                var isBlocked = Physics.Linecast(position, perception.View.position, blocking);
-                if (isBlocked)
-                    continue;
 
                 foreach (var listener in perception.Listeners) {
                     yield return listener;
@@ -69,7 +62,6 @@ namespace SimpleAI.Perception {
             Assert.IsNotNull(perception);
 
             _receivers.Add(perception);
-            _blocking.Add(Blocking);
         }
 
         public void Remove(AIPerception perception) {
@@ -79,9 +71,6 @@ namespace SimpleAI.Perception {
             if (idx != -1) {
                 _receivers[idx] = _receivers[_receivers.Count - 1];
                 _receivers.RemoveAt(_receivers.Count - 1);
-
-                _blocking[idx] = _blocking[_blocking.Count - 1];
-                _blocking.RemoveAt(_blocking.Count - 1);
             }
         }
 
