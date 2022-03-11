@@ -7,13 +7,17 @@ namespace SimpleAI.EQS {
     public class EQSLogWindow : EditorWindow, IEQSLogger {
         struct Entry {
             public Query Query;
+            public QueryRunMode RunMode;
+            public ResolvedQueryRunContext Ctx;
             public Item[] Items;
             public int? BestIdx;
             public double Time;
         }
 
         [SerializeField]
-        List<Entry> _entries = new List<Entry>();
+        List<string> _entryQueryName = new();
+        [SerializeField]
+        List<Entry> _entries = new();
         [SerializeField]
         int _selectedIdx;
         Vector2 _scrollPos;
@@ -24,13 +28,16 @@ namespace SimpleAI.EQS {
             instance.Show();
         }
 
-        public void Foo(Query query, Span<Item> items, int? bestIdx) {
+        public void Foo(Query query, QueryRunMode mode, ResolvedQueryRunContext ctx, Span<Item> items, int? bestIdx) {
             _entries.Add(new Entry() {
                 Query = query,
+                RunMode = mode,
+                Ctx = ctx,
                 Items = items.ToArray(),
                 BestIdx = bestIdx,
                 Time = Time.timeAsDouble
             });
+            _entryQueryName.Add(query.name);
             Repaint();
         }
 
@@ -58,6 +65,7 @@ namespace SimpleAI.EQS {
             GUILayout.BeginHorizontal(EditorStyles.toolbar);
             if (GUILayout.Button("Clear", EditorStyles.toolbarButton)) {
                 _entries.Clear();
+                _entryQueryName.Clear();
             }
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
@@ -70,11 +78,9 @@ namespace SimpleAI.EQS {
                 var activeButtonStyle = new GUIStyle(GUI.skin.button);
                 activeButtonStyle.fontStyle = FontStyle.Bold;
 
-                for (int i = 0; i < _entries.Count; ++i) {
-                    var e = _entries[i];
-
+                for (int i = 0; i < _entryQueryName.Count; ++i) {
                     var style = i != _selectedIdx ? GUI.skin.button : activeButtonStyle;
-                    if (GUILayout.Button(e.Query.name, style)) {
+                    if (GUILayout.Button(_entryQueryName[i], style)) {
                         _selectedIdx = i;
                     }
                 }
@@ -86,6 +92,7 @@ namespace SimpleAI.EQS {
                 if (_selectedIdx >= 0 && _selectedIdx < _entries.Count) {
                     var e = _entries[_selectedIdx];
                     EditorGUILayout.LabelField($"Time: {e.Time:0.00}");
+                    EditorGUILayout.LabelField($"Run Mode: {e.RunMode}");
                 }
                 EditorGUILayout.EndVertical();
             }
