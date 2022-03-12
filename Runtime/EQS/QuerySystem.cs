@@ -65,6 +65,8 @@ namespace SimpleAI.EQS {
                 _items[i].Score = totalScore;
             }
 
+            var validItems = new Span<Item>(_items, 0, num);
+
             switch (mode) {
                 case QueryRunMode.Best: {
                         var bestScore = 0f;
@@ -77,7 +79,7 @@ namespace SimpleAI.EQS {
                             }
                         }
                         var best = _items[bestIdx];
-                        ActiveLogger?.Foo(query, mode, resolvedCtx, new Span<Item>(_items, 0, num), bestIdx);
+                        ActiveLogger?.Foo(query, mode, resolvedCtx, validItems, bestIdx);
                         done(best);
                         break;
                     }
@@ -102,16 +104,16 @@ namespace SimpleAI.EQS {
 
                         var bestIdx = UnityEngine.Random.Range(0, _tempListItems.Count);
                         var best = _tempListItems[bestIdx];
-                        ActiveLogger?.Foo(query, mode, resolvedCtx, new Span<Item>(_items, 0, num), bestIdx);
+                        ActiveLogger?.Foo(query, mode, resolvedCtx, validItems, bestIdx);
                         done(best);
                         break;
                     }
                 case QueryRunMode.All: {
+                        ActiveLogger?.Foo(query, mode, resolvedCtx, validItems, null);
                         for (int i = 0; i < num; ++i) {
                             var item = _items[i];
                             done(item);
                         }
-                        ActiveLogger?.Foo(query, mode, resolvedCtx, new Span<Item>(_items, 0, num), null);
                         break;
                     }
                 default:
