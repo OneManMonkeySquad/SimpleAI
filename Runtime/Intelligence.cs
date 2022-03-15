@@ -8,6 +8,7 @@ namespace SimpleAI {
         public ActionSet[] actionSets;
 
         static List<(float, ActionBase, ActionSet)> s_temp = new List<(float, ActionBase, ActionSet)>();
+
         public (ActionBase, ActionSet) SelectAction<T>(T ctx, float minScore) where T : class, IContext {
 #if UNITY_EDITOR
             var writeDebug = AIDebugger.CurrentDebugTarget == ctx && AIDebugger.Active != null;
