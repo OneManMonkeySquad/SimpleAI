@@ -19,13 +19,13 @@ namespace SimpleAI {
     public class AgentLogWindow : EditorWindow, IAIListener {
         public static AgentLogWindow Instance => Object.FindObjectOfType<AgentLogWindow>();
 
-        Vector2 scrollPos;
-        StringBuilder logLines = new StringBuilder();
-        bool log = true;
-        bool context = true;
-        bool clearOnPlay = true;
-        bool clearOnSwitchAgent;
-        Vector2 typesScrollPos;
+        Vector2 _scrollPos;
+        StringBuilder _logLines = new StringBuilder();
+        bool _log = true;
+        bool _context = true;
+        bool _clearOnPlay = true;
+        bool _clearOnSwitchAgent;
+        Vector2 _typesScrollPos;
 
         [MenuItem("Tools/SimpleAI/AIAgent Log")]
         static void Init() {
@@ -35,27 +35,27 @@ namespace SimpleAI {
 
         public void LogLine(string text) {
             var linesToKeep = 1000;
-            if (logLines.Length > linesToKeep) {
+            if (_logLines.Length > linesToKeep) {
                 var off = 0;
                 for (; off < linesToKeep - 1; ++off) {
-                    if (logLines[off] == '\n' && logLines[off + 1] == '\n') {
-                        logLines.Remove(0, off + 1);
+                    if (_logLines[off] == '\n' && _logLines[off + 1] == '\n') {
+                        _logLines.Remove(0, off + 1);
                         break;
                     }
                 }
             }
 
-            logLines.AppendLine(text);
-            scrollPos.y = float.PositiveInfinity;
+            _logLines.AppendLine(text);
+            _scrollPos.y = float.PositiveInfinity;
 
             Repaint();
         }
 
         public void OnEnterPlayMode() {
-            if (!clearOnPlay)
+            if (!_clearOnPlay)
                 return;
 
-            logLines.Clear();
+            _logLines.Clear();
             Repaint();
         }
 
@@ -85,27 +85,27 @@ namespace SimpleAI {
             bool clearClicked = false;
             if (DropDownToggle(ref clearClicked, new GUIContent("Clear"), GetStyle("toolbarDropDownToggle"))) {
                 GenericMenu menu = new GenericMenu();
-                menu.AddItem(new GUIContent("Clear On Play"), clearOnPlay, () => { clearOnPlay = !clearOnPlay; });
+                menu.AddItem(new GUIContent("Clear On Play"), _clearOnPlay, () => { _clearOnPlay = !_clearOnPlay; });
                 var rect = GUILayoutUtility.GetLastRect();
                 rect.y += EditorGUIUtility.singleLineHeight;
                 menu.DropDown(rect);
             }
             if (clearClicked) {
-                logLines.Clear();
+                _logLines.Clear();
                 GUIUtility.keyboardControl = 0;
             }
 
             GUILayout.Space(5);
 
-            log = GUILayout.Toggle(log, "Log", EditorStyles.toolbarButton);
-            context = GUILayout.Toggle(context, "Ctx", EditorStyles.toolbarButton);
+            _log = GUILayout.Toggle(_log, "Log", EditorStyles.toolbarButton);
+            _context = GUILayout.Toggle(_context, "Ctx", EditorStyles.toolbarButton);
 
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
             var content = EditorGUILayout.BeginHorizontal();
 
-            if (log) {
+            if (_log) {
                 if (textStyle == null) {
                     textStyle = new GUIStyle();
                     textStyle.richText = true;
@@ -113,8 +113,8 @@ namespace SimpleAI {
                 }
 
                 EditorGUILayout.BeginVertical();
-                scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
-                var text = logLines.ToString();
+                _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
+                var text = _logLines.ToString();
                 if (text.Length == 0 && AIDebugger.CurrentDebugTarget == null) {
                     text = "<set AIDebugger.CurrentDebugTarget at runtime>";
                 }
@@ -122,9 +122,9 @@ namespace SimpleAI {
                 EditorGUILayout.EndScrollView();
                 EditorGUILayout.EndVertical();
             }
-            if (context) {
+            if (_context) {
                 EditorGUILayout.BeginVertical(GUILayout.Height(content.height / 2));
-                typesScrollPos = GUILayout.BeginScrollView(typesScrollPos);
+                _typesScrollPos = GUILayout.BeginScrollView(_typesScrollPos);
 
                 if (AIDebugger.CurrentDebugTarget != null) {
                     GUILayout.Label(AIDebugger.CurrentDebugTarget.ToString());

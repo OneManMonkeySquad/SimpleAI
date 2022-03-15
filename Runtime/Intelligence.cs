@@ -6,10 +6,15 @@ namespace SimpleAI {
     [CreateAssetMenu(menuName = "AI/Intelligence")]
     public class Intelligence : ScriptableObject {
         public ActionSet[] actionSets;
+        [Range(0f, 1f)]
+        [Tooltip("Actions below this score are discarded. This prevents Actions with low or zero scores running because there are no good Actions.")]
+        public float MinScore = 0.1f;
 
         static List<(float, ActionBase, ActionSet)> s_temp = new List<(float, ActionBase, ActionSet)>();
 
         public (ActionBase, ActionSet) SelectAction<T>(T ctx, float minScore) where T : class, IContext {
+            minScore = System.Math.Max(minScore, MinScore);
+
 #if UNITY_EDITOR
             var writeDebug = AIDebugger.CurrentDebugTarget == ctx && AIDebugger.Active != null;
             if (writeDebug)
@@ -41,15 +46,17 @@ namespace SimpleAI {
 
                     if (score < minScore) {
 #if UNITY_EDITOR
-                        if (writeDebug)
+                        if (writeDebug) {
                             AIDebugger.LogLine(ctx, $"<i>{action.name}</i> {score:0.00} < {minScore:0.00}");
+                        }
 #endif
                         continue;
                     }
                     if (!action.CheckProceduralPreconditions(ctx)) {
 #if UNITY_EDITOR
-                        if (writeDebug)
+                        if (writeDebug) {
                             AIDebugger.LogLine(ctx, $"<color=grey><i>{action.name}</i> precondition</color>");
+                        }
 #endif
                         continue;
                     }
