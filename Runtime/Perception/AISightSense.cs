@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DataStructures.ViliWonka.KDTree;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -18,18 +19,19 @@ namespace SimpleAI.Perception {
         public LayerMask LineOfSightBlockingMask;
         [Tooltip("At this distance anything is detected")]
         public float AnyAngleDetectionDistance = 2;
+        public AIPerceptionGroup[] ExcludedGroups;
 
-        static List<GameObject> s_sources = new List<GameObject>();
+        static List<AIPerceptionSightSource> s_sources = new();
         static int s_sourceBuildAtFrame;
 
-        static KDTree s_tree = new KDTree();
-        static List<Vector3> s_points = new List<Vector3>();
-        static List<int> s_results = new List<int>();
-        static KDQuery s_query = new KDQuery();
-        static HashSet<GameObject> s_targetsReported = new HashSet<GameObject>();
+        static KDTree s_tree = new();
+        static List<Vector3> s_points = new();
+        static List<int> s_results = new();
+        static KDQuery s_query = new();
+        static HashSet<GameObject> s_targetsReported = new();
 
-        public static void AddSource(GameObject source) => s_sources.Add(source);
-        public static void RemoveSource(GameObject source) => s_sources.Remove(source);
+        public static void AddSource(AIPerceptionSightSource source) => s_sources.Add(source);
+        public static void RemoveSource(AIPerceptionSightSource source) => s_sources.Remove(source);
 
         public void Add(AIPerception perception) { }
         public void Remove(AIPerception perception) { }
@@ -69,6 +71,8 @@ namespace SimpleAI.Perception {
                 for (int i = 0; i < s_results.Count; ++i) {
                     var sourceIdx = s_results[i];
                     var target = s_sources[sourceIdx];
+                    if (target.Group != null && ExcludedGroups.Contains(target.Group))
+                        continue;
 
                     var diffToTarget = target.transform.position - view.position;
 
@@ -85,23 +89,28 @@ namespace SimpleAI.Perception {
                             continue;
                     }
 
-                    if (!CheckTarget(target, perception, sqrDistanceToTarget, maxDistance))
+                    if (!CheckTarget(target.gameObject, perception, sqrDistanceToTarget, maxDistance))
                         continue;
 
                     // Make sure we report everything only once
-                    if (s_targetsReported.Contains(target))
+                    if (s_targetsReported.Contains(target.gameObject))
                         continue;
 
-                    s_targetsReported.Add(target);
+                    s_targetsReported.Add(target.gameObject);
 
                     // Report
                     foreach (var listener in listeners) {
-                        listener.OnSensed(target);
+                        listener.OnSensed(target.gameObject);
                     }
                 }
             }
         }
 
+
+        /// <summary>
+        /// Overwrite this to implement f.i. sneaking on the sense level.
+        /// </summary>
+        /// <returns>true if target was detected, false if not and it should be ignored.</returns>
         protected virtual bool CheckTarget(GameObject target, AIPerception perception, float sqrDistanceToTarget, float maxDistance) => true;
 
 #if UNITY_EDITOR
