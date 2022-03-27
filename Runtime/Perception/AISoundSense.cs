@@ -8,7 +8,6 @@ namespace SimpleAI.Perception {
     [Serializable]
     public class AISoundSense : ISense {
         static List<AIPerception> _receivers = new();
-        static List<LayerMask> _blocking = new();
         static int _sourceBuildAtFrame;
         static int _sourceBuildForCount;
 
