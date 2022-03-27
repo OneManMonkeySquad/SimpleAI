@@ -71,6 +71,9 @@ namespace SimpleAI.Perception {
                 for (int i = 0; i < s_results.Count; ++i) {
                     var sourceIdx = s_results[i];
                     var target = s_sources[sourceIdx];
+                    if (perception.gameObject == target.gameObject)
+                        continue; // Maybe not detect ourselves
+
                     if (target.Group != null && ExcludedGroups.Contains(target.Group))
                         continue;
 
