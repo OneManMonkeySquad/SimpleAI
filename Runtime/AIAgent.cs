@@ -125,8 +125,13 @@ namespace SimpleAI {
             Assert.IsNotNull(actionPair.Item1);
 
 #if UNITY_EDITOR
-            if (AIDebugger.CurrentDebugTarget == ctx && AIDebugger.Active != null)
-                AIDebugger.LogLine(ctx, $"<b>{CurrentAction?.name} -> {actionPair.Item1.name}</b>");
+            if (AIDebugger.CurrentDebugTarget == ctx && AIDebugger.Active != null) {
+                if (CurrentAction != null) {
+                    AIDebugger.LogLine(ctx, $"> <b>{CurrentAction.name} -> {actionPair.Item1.name}</b>");
+                } else {
+                    AIDebugger.LogLine(ctx, $"> <b>Start {actionPair.Item1.name}</b>");
+                }
+            }
 #endif
 
             Stop(ctx);
