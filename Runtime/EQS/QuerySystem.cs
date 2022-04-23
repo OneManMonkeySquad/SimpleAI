@@ -5,7 +5,7 @@ using UnityEngine.Assertions;
 
 namespace SimpleAI.EQS {
     public interface IEQSLogger {
-        void Foo(Query query, QueryRunMode mode, ResolvedQueryRunContext ctx, Span<Item> items, int? bestIdx);
+        void LogQuery(Query query, QueryRunMode mode, ResolvedQueryRunContext ctx, Span<Item> items, int? bestIdx);
     }
 
     public class QuerySystem : MonoBehaviour {
@@ -79,7 +79,7 @@ namespace SimpleAI.EQS {
                             }
                         }
                         var best = _items[bestIdx];
-                        ActiveLogger?.Foo(query, mode, resolvedCtx, validItems, bestIdx);
+                        ActiveLogger?.LogQuery(query, mode, resolvedCtx, validItems, bestIdx);
                         done(best);
                         break;
                     }
@@ -104,12 +104,12 @@ namespace SimpleAI.EQS {
 
                         var bestIdx = UnityEngine.Random.Range(0, _tempListItems.Count);
                         var best = _tempListItems[bestIdx];
-                        ActiveLogger?.Foo(query, mode, resolvedCtx, validItems, bestIdx);
+                        ActiveLogger?.LogQuery(query, mode, resolvedCtx, validItems, bestIdx);
                         done(best);
                         break;
                     }
                 case QueryRunMode.All: {
-                        ActiveLogger?.Foo(query, mode, resolvedCtx, validItems, null);
+                        ActiveLogger?.LogQuery(query, mode, resolvedCtx, validItems, null);
                         for (int i = 0; i < num; ++i) {
                             var item = _items[i];
                             done(item);

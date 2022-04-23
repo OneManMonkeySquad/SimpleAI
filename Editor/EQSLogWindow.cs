@@ -28,7 +28,7 @@ namespace SimpleAI.EQS {
             instance.Show();
         }
 
-        public void Foo(Query query, QueryRunMode mode, ResolvedQueryRunContext ctx, Span<Item> items, int? bestIdx) {
+        public void LogQuery(Query query, QueryRunMode mode, ResolvedQueryRunContext ctx, Span<Item> items, int? bestIdx) {
             _entries.Add(new Entry() {
                 Query = query,
                 RunMode = mode,
