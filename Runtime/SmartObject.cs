@@ -1,5 +1,7 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SimpleAI {
     public abstract class SmartObjectBase : MonoBehaviour {
@@ -32,6 +34,50 @@ namespace SimpleAI {
 
         public abstract IEnumerator StartAction(IContext ctx);
         public abstract void StopAction(IContext ctx);
+
+        /// Select the best (and possible) SmartObject from a list of SmartObjects.
+        public static SmartObjectBase SelectSmartObject(IContext ctx, IEnumerable<SmartObjectBase> smartObjects) {
+            Assert.IsNotNull(ctx);
+            Assert.IsNotNull(smartObjects);
+            if (ctx == null || smartObjects == null)
+                return null;
+
+            SmartObjectBase bestSmartObject = null;
+            float bestScore = 0;
+
+            foreach (var smartObject in smartObjects) {
+                if (smartObject == null) {
+                    Debug.LogWarning("SmartObject null");
+                    continue;
+                }
+
+                if (smartObject.Checks != null) {
+                    var checksFailed = false;
+                    foreach (var check in smartObject.Checks) {
+                        if (check == null)
+                            continue;
+
+                        if (!check.Evaluate(ctx)) {
+                            checksFailed = true;
+                            break;
+                        }
+                    }
+                    if (checksFailed)
+                        continue;
+                }
+
+                var score = smartObject.Score(ctx);
+                if (score < 0.01f)
+                    continue;
+
+                if (score > bestScore && smartObject.CheckProceduralPreconditions(ctx)) {
+                    bestScore = score;
+                    bestSmartObject = smartObject;
+                }
+            }
+
+            return bestSmartObject;
+        }
 
 #if UNITY_EDITOR
         void OnValidate() {
