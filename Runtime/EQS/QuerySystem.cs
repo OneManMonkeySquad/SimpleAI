@@ -34,14 +34,14 @@ namespace SimpleAI.EQS {
 
         public static IEQSLogger ActiveLogger;
 
-        Queue<Job> _jobs = new Queue<Job>();
+        readonly Queue<Job> _jobs = new();
 
         public void QueueJob(Job job) {
             _jobs.Enqueue(job);
         }
 
-        Item[] _items = new Item[64];
-        List<Item> _tempListItems = new List<Item>();
+        readonly Item[] _items = new Item[64];
+        readonly List<Item> _tempListItems = new();
         public void Execute(Query query, QueryRunMode mode, QueryRunContext ctx, QueryExecuteDone done) {
             if (query.Generator == null)
                 return;
@@ -121,11 +121,11 @@ namespace SimpleAI.EQS {
             }
         }
 
-        void Awake() {
+        protected void Awake() {
             s_instance = this;
         }
 
-        void Update() {
+        protected void Update() {
             if (_jobs.Count == 0)
                 return;
 
