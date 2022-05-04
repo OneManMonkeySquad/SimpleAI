@@ -1,10 +1,10 @@
-using CareBoo.Serially;
+using GameCore;
 using UnityEngine;
 
 namespace SimpleAI {
     public class NotCheck : ICheckBase {
         [SerializeReference]
-        [ShowSerializeReference]
+        [SelectImplementation(typeof(ICheckBase))]
         public ICheckBase Check;
 
         public bool Evaluate(IContext ctx) {

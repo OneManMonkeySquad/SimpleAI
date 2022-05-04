@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CareBoo.Serially;
+using GameCore;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -79,10 +79,10 @@ namespace SimpleAI.EQS {
     public class Query : ScriptableObject {
         public QueryContext Around;
         [SerializeReference]
-        [ShowSerializeReference]
+        [SelectImplementation(typeof(IGenerator))]
         public IGenerator Generator;
         [SerializeReference]
-        [ShowSerializeReference]
+        [SelectImplementation(typeof(ITest))]
         public List<ITest> Tests;
 
         public Task<Item> ExecuteAsync(QueryRunMode mode, QueryRunContext ctx) {

@@ -1,5 +1,5 @@
 using System;
-using CareBoo.Serially;
+using GameCore;
 using UnityEngine;
 
 namespace SimpleAI.Perception {
@@ -7,7 +7,7 @@ namespace SimpleAI.Perception {
     [Serializable]
     public class AIPerceptionSettings : ScriptableObject {
         [SerializeReference]
-        [ShowSerializeReference]
+        [SelectImplementation(typeof(ISense))]
         public ISense[] Senses;
         public float UpdateRate = 1;
 
