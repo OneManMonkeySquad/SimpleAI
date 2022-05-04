@@ -1,6 +1,8 @@
 # SimpleAI
 Coroutine-based utility AI for [Unity3d](https://unity3d.com). Includes an Unreal inspired perception and environment query system.
 
+Requires [GameCore](https://github.com/MKSQD/GameCore) (not a packet yet because the author is lazy AF).
+
 This repo is relatively stable and production ready.
 
 ## Overview
