@@ -11,7 +11,7 @@ namespace SimpleAI.Perception {
         public ISense[] Senses;
         public float UpdateRate = 1;
 
-        void OnValidate() {
+        protected void OnValidate() {
             foreach (var sense in Senses) {
                 if (sense == null) {
                     Debug.LogError("null", this);

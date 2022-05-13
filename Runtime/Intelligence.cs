@@ -10,7 +10,7 @@ namespace SimpleAI {
         [Tooltip("Actions below this score are discarded. This prevents Actions with low or zero scores running because there are no good Actions.")]
         public float MinScore = 0.1f;
 
-        static List<(float, ActionBase, ActionSet)> s_temp = new List<(float, ActionBase, ActionSet)>();
+        static List<(float, ActionBase, ActionSet)> s_temp = new();
 
         public (ActionBase, ActionSet) SelectAction<T>(T ctx, float minScore) where T : class, IContext {
             minScore = System.Math.Max(minScore, MinScore);

@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -15,6 +14,8 @@ namespace SimpleAI {
         float _nextReevaluationTime;
 
         public AIAgent(Intelligence intelligence, float evaluationTickRate = 1) {
+            Assert.IsNotNull(intelligence);
+
             Intelligence = intelligence;
             _evaluationTickRate = evaluationTickRate;
         }
