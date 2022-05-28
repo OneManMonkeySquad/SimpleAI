@@ -13,7 +13,7 @@ namespace SimpleAI.EQS {
             public Query Query;
             public QueryRunMode Mode;
             public QueryRunContext Ctx;
-            public QueryExecuteDone Done;
+            public Query.ResultCallback Done;
         }
 
         static QuerySystem s_instance;
@@ -42,7 +42,7 @@ namespace SimpleAI.EQS {
 
         readonly Item[] _items = new Item[64];
         readonly List<Item> _tempListItems = new();
-        public void Execute(Query query, QueryRunMode mode, QueryRunContext ctx, QueryExecuteDone done) {
+        public void Execute(Query query, QueryRunMode mode, QueryRunContext ctx, Query.ResultCallback done) {
             if (query.Generator == null)
                 return;
 

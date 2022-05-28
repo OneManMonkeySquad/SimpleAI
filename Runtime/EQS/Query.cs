@@ -73,10 +73,10 @@ namespace SimpleAI.EQS {
         }
     }
 
-    public delegate void QueryExecuteDone(Item item);
-
-    [CreateAssetMenu(menuName = "AI/Environment Query")]
+    [CreateAssetMenu(menuName = "SimpleAI/Environment Query")]
     public class Query : ScriptableObject {
+        public delegate void ResultCallback(Item item);
+
         public QueryContext Around;
         [SerializeReference]
         [SelectImplementation(typeof(IGenerator))]
@@ -93,7 +93,7 @@ namespace SimpleAI.EQS {
             return tcs.Task;
         }
 
-        public void ExecuteAsync(QueryRunMode mode, QueryRunContext ctx, QueryExecuteDone done) {
+        public void ExecuteAsync(QueryRunMode mode, QueryRunContext ctx, ResultCallback done) {
             var job = new QuerySystem.Job() {
                 Query = this,
                 Mode = mode,
@@ -103,7 +103,7 @@ namespace SimpleAI.EQS {
             QuerySystem.Instance.QueueJob(job);
         }
 
-        public void Execute(QueryRunMode mode, QueryRunContext ctx, QueryExecuteDone done) {
+        public void Execute(QueryRunMode mode, QueryRunContext ctx, ResultCallback done) {
             QuerySystem.Instance.Execute(this, mode, ctx, done);
         }
 

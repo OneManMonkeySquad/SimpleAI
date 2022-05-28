@@ -14,7 +14,6 @@ namespace SimpleAI.Perception {
     public interface ISenseListener {
         void OnSensed(GameObject source);
         void OnDeathSensed(GameObject source, GameObject killer);
-        void OnStealingSensed(GameObject source);
     }
 
     class SenseDebugDrawer : ISenseListener {

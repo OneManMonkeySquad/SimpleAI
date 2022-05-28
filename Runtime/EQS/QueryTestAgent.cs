@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace SimpleAI.EQS {
 #if UNITY_EDITOR
-    [AddComponentMenu("AI/EQSQueryTestAgent")]
+    [AddComponentMenu("SimpleAI/EQSQueryTestAgent")]
     public class QueryTestAgent : MonoBehaviour {
         public Query Query;
         public Transform Target;
 
-        [MenuItem("Tools/SimpleAI/Create EQS Query Test Agent")]
+        [MenuItem("GameObject/SimpleAI/Environment Query Test Agent", false, 10)]
         static void CreateAgent() {
             var pos = SceneView.lastActiveSceneView.camera.transform.TransformPoint(Vector3.forward * 5);
 
