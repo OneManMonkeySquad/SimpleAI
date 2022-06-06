@@ -7,14 +7,14 @@ using UnityEngine.Assertions;
 namespace SimpleAI.Perception {
     [Serializable]
     public class AISoundSense : ISense {
-        static List<AIPerception> _receivers = new();
+        static readonly List<AIPerception> _receivers = new();
         static int _sourceBuildAtFrame;
         static int _sourceBuildForCount;
 
-        static KDTree _tree = new KDTree();
-        static List<Vector3> _points = new List<Vector3>();
-        static List<int> _results = new List<int>();
-        static KDQuery _query = new KDQuery();
+        static readonly KDTree _tree = new();
+        static readonly List<Vector3> _points = new();
+        static readonly List<int> _results = new();
+        static readonly KDQuery _query = new();
 
         public static void TriggerSensedAt(GameObject source, Vector3 position, float radius) {
             Assert.IsNotNull(source);

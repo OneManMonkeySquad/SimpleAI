@@ -6,16 +6,8 @@ namespace SimpleAI.EQS {
     [UnityEngine.Scripting.APIUpdating.MovedFrom(false, null, "Assembly-CSharp")]
     [Serializable]
     public class LinecastTest : ITest {
-        public enum Score {
-            None,
-            Closest,
-            Furthest
-        }
-
-        public enum ModType {
-            RequireHit,
-            RequireMiss
-        }
+        public enum Score { None, Closest, Furthest }
+        public enum ModType { RequireHit, RequireMiss }
 
         public QueryContext To;
         [FormerlySerializedAs("LinecastMask")]
