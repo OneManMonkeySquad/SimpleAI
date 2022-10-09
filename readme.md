@@ -12,11 +12,11 @@ Every AIAgent has a set of possible Actions and at most one coroutine. Which Act
 
 Compared to state-of-the-art behaviour trees this solution is as lightweight as it gets. As simple and cheap as a FSM but modular, extensible and comfy to write code for. There's no editor to learn, everything is boring old ScriptableObjects and plain classes. On the other hand it's harder to balance as Actions are chosen by fuzzy scores instead of rigid if-then rules. Out of the box designers can only tweak when actions are chosen/interrupted and tweak action parameters, nothing more.
 
-Note that the AI does not plan in any way. It is purely reactionary. I'm being shot so I'm in combat now. I'm almost dead so I'm running away now. If you need something like this look into GOAP or the more modern HTN.
+Note that the AI does not plan in any way. It is purely reactionary. _I'm being shot so I'm in combat now. I'm almost dead so I'm running away now._ If you need planning look into GOAP or the more modern HTN.
 
 There's support for multiple types of AI (Intelligences - soldiers, zombies, animals, ...) in the same project. There's a simple EQS system to search for good positions based on utility functions.
 
-_If it's this simple why wouldn't I want to do this myself?_ Well big chief, this library is as minimal as it gets. So there's no bloat or features you won't use. The logic is simple and not spectacular yet the details matter. There's  tooling which is import as the biggest gripe with the this AI is the scoring and why an Action was chosen/interrupted.
+_If it's this simple why wouldn't I want to do this myself?_ Well big chief, this library is as minimal as it gets. So there's no bloat or features you won't use. The logic is simple and not spectacular yet the details matter. There's  tooling which is important as the biggest gripe with the this AI is the scoring and why an Action was chosen/interrupted.
 
 _Well if utility based scoring is hard to balance why not use a tree, for say, behaviour?_ Because it's easy to extend and tweak. No need to think about rules, just give the AI some context, Actions and considerations/checks and watch it go. Everything can be tweaked at runtime and there's a runtime debugger to see why an Action was chosen. Actions themselves can be as simple or complex as required. From a simple goto, animate, SmartObject to a cutscene written in plain C#.
 
@@ -26,6 +26,11 @@ _Well if utility based scoring is hard to balance why not use a tree, for say, b
 
 ```cs
 // A context contains all the data that's relevant for the AI to run.
+// This is an AIs "view" of the world. You could process all the things
+// ad-hoc every time a new Action is considered/the AI is ticked but
+// you don't want to do that mainly for performance reasons. That's
+// why we want an "IsArmed" here instead of accessing the Actor, then
+// it's Inventory and looking through the item List.
 public class ActorAIContext : IContext {
     public MonoBehaviour CoroutineTarget => Actor;
 
@@ -34,6 +39,7 @@ public class ActorAIContext : IContext {
 
     public Actor BestTarget;
     public SmartObjectBase BestSmartObject;
+    public SmartObjectBase CurrentSmartObject;
 
     public bool IsArmed = false;
 
@@ -54,7 +60,9 @@ public class ActorAIContext : IContext {
         };
 }
 
+// Your "enemy" component. This owns and updates both the context and the AIAgent.
 public class Actor : MonoBehaviour {
+    // The "type" of AI to use (zombie, soldier, ...)
     public Intelligence Intelligence;
 
     ActorAIContext ctx;
@@ -72,7 +80,8 @@ public class Actor : MonoBehaviour {
         if (Time.time >= nextContextUpdateTime) {
             nextContextUpdateTime = Time.time + 0.1f;
             
-            // Getters, raycasts, Physics.OverlapSphereNonAlloc, etc. to fill the context with valuable information (ctx.SmartObjects for instance)
+            // Getters, raycasts, Physics.OverlapSphereNonAlloc, etc. to fill the context
+            // with valuable information
             ctx.BestTarget = ...;
             ctx.BestSmartObject = ai.SelectSmartObject(ctx, ctx.SmartObjects);
             ctx.IsArmed = ...;
@@ -90,6 +99,8 @@ public class Actor : MonoBehaviour {
     }
 }
 
+// One example "Action" the AI can do. Note that this needs to be in its own
+// file because it's a ScriptableObject.
 [CreateAssetMenu(menuName = "AI/Actor/Attack")]
 public class AttackAction : Action<ActorAIContext> {
     public override IEnumerator StartAction(ActorAIContext ctx) {
@@ -103,6 +114,10 @@ public class AttackAction : Action<ActorAIContext> {
         Debug.Log("Done Attacking");
     }
 
+    public override void StopAction(ActorAIContext ctx) {
+        Debug.Log("Attack completed or was canceled");
+    }
+
     public override bool CheckProceduralPreconditions(ActorAIContext ctx) {
         return ctx.BestTarget != null;
     }
@@ -113,6 +128,75 @@ public class AttackAction : Action<ActorAIContext> {
 ![Logger](Docs/Logger.png)
 
 Under _SimpleAI/AIAgent Log_.
+
+## SmartObjects
+...are an AI inversion of control technique. Instead of an Action coroutine running for the AIAgent, there's a coroutine running inside the SmartObject (to be precise, there's still a "normal" Action running for the AI, but its passing all control to the SmartObject). This allows for object (chair, turret, public speech, patrol, fridge, ...) specific Actions (think The Sims).
+ 
+
+```cs
+// SmartObject is basically like an Action, but instead of being derived from ScriptableObject,
+// it's derived from MonoBehaviour and can be slapped on a GameObject.
+public class Patrol : SmartObject<ActorAIContext> {
+    public Transform[] points;
+
+    public override IEnumerator StartAction(ActorAIContext ctx) {
+        for (int i = 0; i < points.Length; ++i) {
+            var point = points[i];
+
+            while (true) {
+                var result = ctx.controller.WalkTo(point.position);
+                if (result == AIController.MoveResult.Failed)
+                    yield break;
+
+                if (result == AIController.MoveResult.Arrived)
+                    break;
+
+                yield return null;
+            }
+        }
+    }
+
+    public override void StopAction(ActorAIContext ctx) {
+    }
+
+    void OnDrawGizmos() {
+        if (points == null || points.Length == 0)
+            return;
+
+        var lastPoint = points[0];
+        for (int i = 1; i < points.Length; ++i) {
+            var point = points[i];
+            Gizmos.color = Color.white;
+            Gizmos.DrawLine(lastPoint.position, point.position);
+        }
+    }
+}
+
+// This class is NOT included in SimpleAI because it's specific to what's in your context.
+// While this Action is running a corresponding coroutine is running inside the SmartObject.
+[CreateAssetMenu(menuName = "AI/Actor/UseSmartObject")]
+public class UseSmartObjectAction : Action<ActorAIContext> {
+    public override IEnumerator StartAction(ActorAIContext ctx) {
+        ctx.CurrentSmartObject = ctx.BestSmartObject;
+        return ctx.CurrentSmartObject.StartAction(ctx); // The SmartObject coroutine is started here
+    }
+
+    public override void StopAction(ActorAIContext ctx) {
+        ctx.CurrentSmartObject.StopAction(ctx);
+    }
+
+    public override bool CheckProceduralPreconditions(ActorAIContext ctx) {
+        return ctx.BestSmartObject != null;
+    }
+
+    public override string ToString(IContext ctx) {
+        if (((ActorAIContext)ctx).CurrentSmartObject != null) {
+            return name + "/" + ((ActorAIContext)ctx).CurrentSmartObject.name;
+        }
+        return name;
+    }
+}
+```
 
 ## Environment Query System
 ![Query](Docs/Query.png)
