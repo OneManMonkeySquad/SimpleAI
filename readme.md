@@ -134,7 +134,7 @@ Under _SimpleAI/AIAgent Log_.
  
 
 ```cs
-// SmartObject is basically like an Action, but instead of being derived from ScriptableObject,
+// SmartObject is basically like an Action, but instead of being derived from ScriptableObject
 // it's derived from MonoBehaviour and can be slapped on a GameObject.
 public class Patrol : SmartObject<ActorAIContext> {
     public Transform[] points;
@@ -144,6 +144,7 @@ public class Patrol : SmartObject<ActorAIContext> {
             var point = points[i];
 
             while (true) {
+                // Note that this won't compile - it's an example from an actual project
                 var result = ctx.controller.WalkTo(point.position);
                 if (result == AIController.MoveResult.Failed)
                     yield break;
